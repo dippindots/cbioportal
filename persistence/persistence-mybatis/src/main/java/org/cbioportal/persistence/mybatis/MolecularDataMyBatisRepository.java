@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.cbioportal.model.GeneMolecularAlteration;
+import org.cbioportal.model.GenericAssayMolecularAlteration;
 import org.cbioportal.model.GenesetMolecularAlteration;
 import org.cbioportal.model.TreatmentMolecularAlteration;
 import org.cbioportal.persistence.MolecularDataRepository;
@@ -56,5 +57,10 @@ public class MolecularDataMyBatisRepository implements MolecularDataRepository {
                                                                            List<String> treatmentIds, String projection) {
 
 		return molecularDataMapper.getTreatmentMolecularAlterations(molecularProfileId, treatmentIds, projection);
-	}
+    }
+    
+    @Override
+    public List<GenericAssayMolecularAlteration> getGenericAssayMolecularAlterations(String molecularProfileId, List<Integer> stableIds, String projection) {
+        return molecularDataMapper.getGenericAssayMolecularAlterations(molecularProfileId, stableIds, projection);
+    }
 }

@@ -177,4 +177,11 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse("Specified token cannot be found");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+    
+    @ExceptionHandler(GenericAssayNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleGenericAssayNotFound(GenericAssayNotFoundException ex) {
+
+        return new ResponseEntity<>(new ErrorResponse("stableId not found: " + ex.getStableId()),
+            HttpStatus.NOT_FOUND);
+    }
 }

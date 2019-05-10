@@ -3,6 +3,7 @@ package org.cbioportal.persistence.mybatis;
 import java.util.List;
 
 import org.cbioportal.model.GeneMolecularAlteration;
+import org.cbioportal.model.GenericAssayMolecularAlteration;
 import org.cbioportal.model.GenesetMolecularAlteration;
 import org.cbioportal.model.TreatmentMolecularAlteration;
 
@@ -19,6 +20,9 @@ public interface MolecularDataMapper {
 	List<GenesetMolecularAlteration> getGenesetMolecularAlterations(String molecularProfileId, List<String> genesetIds,
                                                                     String projection);
     
-    List<TreatmentMolecularAlteration> getTreatmentMolecularAlterations(String molecularProfileId, List<String> treatmentIds,
+    List<TreatmentMolecularAlteration> getTreatmentMolecularAlterations(String molecularProfileId, List<String> treatmentIds, 
+                                                                    String projection);
+
+    List<GenericAssayMolecularAlteration> getGenericAssayMolecularAlterations(String molecularProfileId, List<Integer> stableIds,
                                                                     String projection);
 }

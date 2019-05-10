@@ -5,6 +5,7 @@ import java.util.List;
 import org.cbioportal.model.GeneMolecularAlteration;
 import org.cbioportal.model.GenesetMolecularAlteration;
 import org.cbioportal.model.TreatmentMolecularAlteration;
+import org.cbioportal.model.GenericAssayMolecularAlteration;
 
 public interface MolecularDataRepository {
     
@@ -23,4 +24,7 @@ public interface MolecularDataRepository {
     
     List<TreatmentMolecularAlteration> getTreatmentMolecularAlterations(String molecularProfileId,
         List<String> treatmentIds, String projection);
+
+    List<GenericAssayMolecularAlteration> getGenericAssayMolecularAlterations(String molecularProfileId, List<Integer> stableIds,
+        String projection);
 }
