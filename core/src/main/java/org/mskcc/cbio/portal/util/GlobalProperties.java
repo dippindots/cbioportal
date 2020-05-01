@@ -39,6 +39,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -142,8 +143,8 @@ public class GlobalProperties {
     public static final String STUDY_VIEW_MDACC_HEATMAP_URL = "mdacc.heatmap.study.url";
     public static final String STUDY_VIEW_MDACC_HEATMAP_META_URL = "mdacc.heatmap.study.meta.url";
 
-    public static final String ONCOKB_PUBLIC_API_URL = "oncokb.public_api.url";
     public static final String SHOW_ONCOKB = "show.oncokb";
+    public static final String ONCOKB_TOKEN = "oncokb.token";
 
     private static String sessionServiceURL;
     @Value("${session.service.url:}") // default is empty string
@@ -270,6 +271,10 @@ public class GlobalProperties {
     @Value("${show.genomenexus:true}") // default is true
     public void setShowGenomeNexus(String property) { showGenomeNexus = Boolean.parseBoolean(property); }
 
+    private static boolean showMutationMapperToolGrch38;
+    @Value("${show.mutation_mappert_tool.grch38:true}") // default is true
+    public void setShowMutationMapperToolGrch38(String property) { showMutationMapperToolGrch38 = Boolean.parseBoolean(property); }
+
     private static boolean datRevokeOtherTokens;
     @Value("${dat.uuid.revoke_other_tokens:true}") // default is true
     public void setDatRevokeOtherTokens(String property) { datRevokeOtherTokens = Boolean.parseBoolean(property);}
@@ -312,6 +317,10 @@ public class GlobalProperties {
 	private static String genomeNexusApiUrl;
 	@Value("${genomenexus.url:v1.genomenexus.org}") // default
 	public void setGenomeNexusApiUrl(String property) { genomeNexusApiUrl = parseUrl(property); }
+
+	private static String genomeNexusGrch38ApiUrl;
+	@Value("${genomenexus.url.grch38:grch38.genomenexus.org}") // default
+	public void setGenomeNexusGrch38ApiUrl(String property) { genomeNexusGrch38ApiUrl = parseUrl(property); }
 
     private static String frontendUrl;
     @Value("${frontend.url:}") // default is empty string
@@ -858,34 +867,16 @@ public class GlobalProperties {
         return sessionServicePassword;
     }
 
-    public static String getOncoKBPublicApiUrl()
-    {
-        String oncokbApiUrl = portalProperties.getProperty(ONCOKB_PUBLIC_API_URL);
-        String showOncokb = portalProperties.getProperty(SHOW_ONCOKB);
-        
-        if(showOncokb == null || showOncokb.isEmpty()) {
-                    showOncokb = "true";
-        }
-        
-        // Empty string should be used if you want to disable the OncoKB annotation.
-        if(oncokbApiUrl == null || oncokbApiUrl.isEmpty()) {
-            oncokbApiUrl = "oncokb.org/api/v1";
-        }
-        
-        if(showOncokb.equals("true")) {
-           return oncokbApiUrl;
-        } else {
-           return "";
-        }
-        
-    }
-
     public static String getCivicUrl() {
         return civicUrl;
     }
 
     public static String getGenomeNexusApiUrl() {
         return genomeNexusApiUrl;
+    }
+
+    public static String getGenomeNexusGrch38ApiUrl() {
+        return genomeNexusGrch38ApiUrl;
     }
 
     public static boolean showOncoKB() {
@@ -920,6 +911,10 @@ public class GlobalProperties {
 
     public static boolean showGenomeNexus() {
         return showGenomeNexus;
+    }
+
+    public static boolean showMutationMapperToolGrch38() {
+        return showMutationMapperToolGrch38;
     }
 
     public static String getFrontendUrl() {
@@ -1188,5 +1183,9 @@ public class GlobalProperties {
     
     public static String getReferenceGenomeName() {
         return portalProperties.getProperty(UCSC_BUILD, DEFAULT_UCSC_BUILD);
+    }
+    
+    public static String getOncoKbToken()  {
+        return portalProperties.getProperty(ONCOKB_TOKEN, null);
     }
 }

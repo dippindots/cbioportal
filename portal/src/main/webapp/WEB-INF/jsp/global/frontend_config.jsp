@@ -9,12 +9,13 @@ window.legacySupportFrontendConfig = {
     appVersion : '<%=GlobalProperties.getAppVersion()%>',
     maxTreeDepth : <%=GlobalProperties.getMaxTreeDepth()%>,
     showOncoKB : <%=GlobalProperties.showOncoKB()%>,
-    oncoKBApiUrl : '<%=GlobalProperties.getOncoKBPublicApiUrl()%>',
     genomeNexusApiUrl : '<%=GlobalProperties.getGenomeNexusApiUrl()%>',
+    genomeNexusGrch38ApiUrl : '<%=GlobalProperties.getGenomeNexusGrch38ApiUrl()%>',
     showCivic : <%=GlobalProperties.showCivic()%>,
     showHotspot : <%=GlobalProperties.showHotspot()%>,
     showMyCancerGenome : <%=GlobalProperties.showMyCancerGenomeUrl()%>,
     showGenomeNexus : <%=GlobalProperties.showGenomeNexus()%>,
+    showMutationMapperToolGrch38 : <%=GlobalProperties.showMutationMapperToolGrch38()%>,
     querySetsOfGenes : JSON.parse('<%=GlobalProperties.getQuerySetsOfGenes()%>'),
     skinBlurb : '<%=GlobalProperties.getBlurb()%>',
     skinExampleStudyQueries : '<%=GlobalProperties.getExampleStudyQueries().replace("\n","\\n")%>'.split("\n"),
@@ -95,9 +96,6 @@ window.localdist = localStorage.getItem("localdist") === "true";
 
 if (window.localdist || window.localdev) {
 	window.frontendConfig.frontendUrl = '//localhost:3000/'
-} else if (localStorage.heroku) {
-	var herokuInstance = '//' + localStorage.getItem('heroku') + '.herokuapp.com/';
-	window.frontendConfig.frontendUrl = herokuInstance;
 } else if (localStorage.netlify) {
 	var netlifyInstance = '//' + localStorage.getItem('netlify') + '.netlify.com/';
 	window.frontendConfig.frontendUrl = netlifyInstance;

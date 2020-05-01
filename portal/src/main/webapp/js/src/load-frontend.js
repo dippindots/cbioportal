@@ -2,7 +2,6 @@
 function clearDevState(e){
     localStorage.removeItem('localdev');
     localStorage.removeItem('localdist');
-    localStorage.removeItem('heroku');
     localStorage.removeItem('netlify');
     window.location.reload();
 }
@@ -36,11 +35,11 @@ window.loadReactApp = function(config) {
             console.log('ERROR: No frontend URL defined, should at least be empty string');
         }
     }
-    if (window.localdev || window.localdist || localStorage.heroku || localStorage.netlify) {
+    if (window.localdev || window.localdist || localStorage.netlify) {
         showFrontendPopup(window.frontendConfig.frontendUrl);
     }
-    document.write('<script src="' + window.frontendConfig.frontendUrl + 'reactapp/common.bundle.js?'+ window.frontendConfig.appVersion +'"></scr' + 'ipt>');
-    document.write('<script src="' + window.frontendConfig.frontendUrl + 'reactapp/main.app.js?'+ window.frontendConfig.appVersion +'"></scr' + 'ipt>');
+    document.write('<script type="text/javascript" charset="UTF-8" src="' + window.frontendConfig.frontendUrl + 'reactapp/common.bundle.js?'+ window.frontendConfig.appVersion +'"></scr' + 'ipt>');
+    document.write('<script type="text/javascript" charset="UTF-8" src="' + window.frontendConfig.frontendUrl + 'reactapp/main.app.js?'+ window.frontendConfig.appVersion +'"></scr' + 'ipt>');
 
 };
 

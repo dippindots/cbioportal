@@ -99,7 +99,7 @@
     <http pattern="/reactapp/**" security="none"/>
     <http pattern="/api/swagger-resources/**" security="none"/>
     <http pattern="/api/swagger-ui.html" security="none"/>
-    <http pattern="/health" security="none"/>
+    <http pattern="/api/health" security="none"/>
 
     <!-- This must come before the default entry point which will capture everything not matched by pattern -->
     <http use-expressions="true" pattern="/api/**" entry-point-ref="restAuthenticationEntryPoint" create-session="never">
@@ -349,6 +349,7 @@
         <b:constructor-arg>
             <b:bean class="org.springframework.security.saml.metadata.MetadataGenerator">
                 <b:property name="entityId" value="${saml.sp.metadata.entityid}"/>
+                <b:property name="entityBaseURL" value="${saml.sp.metadata.entitybaseurl}"/>
                 <b:property name="extendedMetadata">
                     <b:bean class="org.springframework.security.saml.metadata.ExtendedMetadata">
                         <b:property name="idpDiscoveryEnabled" value="true"/>

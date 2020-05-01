@@ -63,6 +63,14 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(GeneWithMultipleEntrezIdsException.class)
+    public ResponseEntity<ErrorResponse> handleGeneWithMultipleEntrezIdsException(
+            GeneWithMultipleEntrezIdsException ex) {
+        return new ResponseEntity<>(
+                new ErrorResponse("Gene data error: multiple Entrez gene IDs for " + ex.getGeneId()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(GenesetNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleGenesetNotFound(GenesetNotFoundException ex) {
         return new ResponseEntity<>(new ErrorResponse("Gene set not found: " + ex.getGenesetId()),
@@ -172,5 +180,11 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(new ErrorResponse("stableId not found: " + ex.getStableId()),
             HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ResourceDefinitionNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceDefinitionNotFound(ResourceDefinitionNotFoundException ex) {
+        return new ResponseEntity<>(new ErrorResponse("Resource not found: " + ex.getResourceId()),
+                HttpStatus.NOT_FOUND);
     }
 }

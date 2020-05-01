@@ -1,13 +1,11 @@
 package org.cbioportal.web.parameter;
 
 import java.io.Serializable;
+import java.util.List;
 
-import org.cbioportal.model.ClinicalDataCountItem.ClinicalDataType;
-
-public class ClinicalDataFilter implements Serializable {
+public class ClinicalDataFilter extends DataFilter implements Serializable {
 
     private String attributeId;
-    private ClinicalDataType clinicalDataType;
 
     public String getAttributeId() {
         return attributeId;
@@ -17,11 +15,4 @@ public class ClinicalDataFilter implements Serializable {
         this.attributeId = attributeId;
     }
 
-    public ClinicalDataType getClinicalDataType() {
-        return clinicalDataType;
-    }
-
-    public void setClinicalDataType(ClinicalDataType clinicalDataType) {
-        this.clinicalDataType = clinicalDataType;
-    }
 }

@@ -22,6 +22,7 @@ import org.cbioportal.model.MolecularAlteration;
 import org.cbioportal.model.MolecularProfile;
 import org.cbioportal.model.MolecularProfile.MolecularAlterationType;
 import org.cbioportal.model.MolecularProfileCaseIdentifier;
+import org.cbioportal.model.MolecularProfileSamples;
 import org.cbioportal.model.Gene;
 import org.cbioportal.model.Sample;
 import org.cbioportal.persistence.MolecularDataRepository;
@@ -140,13 +141,17 @@ public class ExpressionEnrichmentServiceImpl implements ExpressionEnrichmentServ
             "SUMMARY")
                 .stream()
                 .collect(Collectors.groupingBy(Gene::getEntrezGeneId));
-
-        expressionEnrichments.forEach(expressionEnrichment -> {
-            Gene gene = geneMapByEntrezId.get(expressionEnrichment.getEntrezGeneId()).get(0);
-            expressionEnrichment.setHugoGeneSymbol(gene.getHugoGeneSymbol());
-        });
         
-        return expressionEnrichments;
+        return expressionEnrichments
+                .stream()
+                // filter Enrichments having no gene reference object(this happens when multiple entrez ids map to same hugo gene symbol)
+                .filter(expressionEnrichment -> geneMapByEntrezId.containsKey(expressionEnrichment.getEntrezGeneId()))
+                .map(expressionEnrichment -> {
+                    Gene gene = geneMapByEntrezId.get(expressionEnrichment.getEntrezGeneId()).get(0);
+                    expressionEnrichment.setHugoGeneSymbol(gene.getHugoGeneSymbol());
+                    return expressionEnrichment;
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -166,10 +171,10 @@ public class ExpressionEnrichmentServiceImpl implements ExpressionEnrichmentServ
             MolecularProfile molecularProfile) {
         
 
-        String commaSeparatedSampleIdsOfMolecularProfile = molecularDataRepository
+        MolecularProfileSamples commaSeparatedSampleIdsOfMolecularProfile = molecularDataRepository
                 .getCommaSeparatedSampleIdsOfMolecularProfile(molecularProfile.getStableId());
         
-        List<Integer> internalSampleIds = Arrays.stream(commaSeparatedSampleIdsOfMolecularProfile.split(","))
+        List<Integer> internalSampleIds = Arrays.stream(commaSeparatedSampleIdsOfMolecularProfile.getSplitSampleIds())
                 .mapToInt(Integer::parseInt)
                 .boxed()
                 .collect(Collectors.toList());

@@ -40,6 +40,7 @@
             "oncoprint.oncokb.default",
             "oncoprint.hotspots.default",
             "genomenexus.url",
+            "genomenexus.url.grch38",
             "google_analytics_profile_id",
             "analytics_report_url",
             "oncoprint.hide_vus.default",
@@ -51,12 +52,14 @@
             "mdacc.heatmap.patient.url",
             "mdacc.heatmap.study.meta.url",
             "mdacc.heatmap.study.url",
+            "show.mdacc.heatmap",
             "oncoprint.custom_driver_annotation.tiers.menu_label",
             "priority_studies",
             "show.hotspot",
             "show.oncokb",
             "show.civic",
             "show.genomenexus",
+            "show.mutation_mappert_tool.grch38",
             "skin.documentation.about",
             "skin.documentation.baseurl",
             "skin.example_study_queries",
@@ -91,6 +94,7 @@
             "skin.show_web_api_tab",
             "skin.show_tweet_button",
             "skin.patientview.filter_genes_profiled_all_samples",
+            "skin.patientview.show_mskcc_slide_viewer",
             "quick_search.enabled",
             "default_cross_cancer_study_session_id",
             "default_cross_cancer_study_list",
@@ -103,8 +107,12 @@
             "bitly.user",
             "bitly.access.token",
             "oncoprint.custom_driver_annotation.tiers.default",
-            "ensembl.transcript_url"
-           
+            "ensembl.transcript_url",
+            "enable_persistent_cache",
+            "query_product_limit",
+            "skin.show_gsva",
+            "saml.logout.local",
+            "skin.citation_rule_text"
         }; 
     
    
@@ -152,7 +160,9 @@
                 enableOncoKBandHotspots = "\"custom\"";
         }
              
-        obj.put("oncoprintOncoKbHotspotsDefault",enableOncoKBandHotspots);    
+        obj.put("oncoprintOncoKbHotspotsDefault",enableOncoKBandHotspots);
+        
+        obj.put("oncoKbTokenDefined", !StringUtils.isEmpty(GlobalProperties.getOncoKbToken()));
         
         obj.put("sessionServiceEnabled", !StringUtils.isEmpty(GlobalProperties.getSessionServiceUrl()));        
                 
