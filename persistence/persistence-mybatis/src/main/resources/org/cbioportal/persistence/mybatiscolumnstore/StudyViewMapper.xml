@@ -35,6 +35,42 @@
         GROUP BY hugo_gene_symbol
         ORDER BY totalCount DESC;
     </select>
+
+
+<!--    columns needed from sample_generic_assay_data-->
+<!--    "VALUE" from genetic_alteration table, after splitting the values column-->
+<!--    "SAMPLE_UNIQUE_ID" from sample table "STABLE_ID" column-->
+<!--    "MOLECULAR_PROFILE_ID" from genetic_alteration table-->
+<!--    "STABLE_ID" from genetic_entity table-->
+<!--    "DATATYPE" from genetic_profile table-->
+    
+    <select id="getGenericAssayCountFromClickhouse" resultType="org.cbioportal.model.GenericAssayDataCount">
+        SELECT
+        sample_generic_assay_data.STABLE_ID as genericEntityStableId,
+        COUNT(*) as count,
+        sample_generic_assay_data.VALUE as value 
+        FROM sample_generic_assay_data
+        WHERE
+            sample_generic_assay_data.DATATYPE = CATEGORICAL
+            OR sample_generic_assay_data.DATATYPE = BINARY
+            <if test="molecularProfileIds != null and molecularProfileIds">
+                AND sample_generic_assay_data.MOLECULAR_PROFILE_ID IN
+                <foreach item="molecularProfileId" collection="molecularProfileIds" open="(" separator="," close=")">
+                    #{molecularProfileIds}
+                </foreach>
+            </if>
+            <if test="stableIds != null and stableIds">
+                AND sample_generic_assay_data.STABLE_ID IN
+                <foreach item="stableId" collection="stableIds" open="(" separator="," close=")">
+                    #{stableId}
+                </foreach>
+            </if>
+            AND sample_unique_id IN (
+                <include refid="sampleUniqueIdsFromStudyViewFilter" />
+            )
+        GROUP BY generic_assay_data_clickhouse.VALUE
+        ORDER BY count DESC;
+    </select>
     
     <!-- This block represents the Study View Filter -->
     <sql id="sampleUniqueIdsFromStudyViewFilter">
@@ -103,6 +139,23 @@
                         </foreach>
                     </trim>
                  )
+            </if>
+            <!--    columns needed from sample_generic_assay_data-->
+            <!--    "SAMPLE_UNIQUE_ID" from sample table "STABLE_ID" column-->
+            <!--    "STABLE_ID" from genetic_entity table-->
+            <if test="genericAssayDataFilters != null and !genericAssayDataFilters.isEmpty()">
+                <foreach item="genericAssayDataFilter" collection="genericAssayDataFilters" open="INTERSECT" separator="INTERSECT">
+                    SELECT SAMPLE_UNIQUE_ID
+                    FROM sample_generic_assay_data
+                    WHERE STABLE_ID = '${genericAssayDataFilter.stableId}' AND
+                    <foreach item="dataFilterValue" collection="genericAssayDataFilter.values" open=" AND ((" separator=") OR (" close="))">
+                        <trim prefix="" prefixOverrides="AND">
+                            <if test="dataFilterValue.value != null">
+                                AND VALUE = ${dataFilterValue.value}
+                            </if>
+                        </trim>
+                    </foreach>
+                </foreach>
             </if>
             <!-- ... extend for other elements of the StudyViewFilter object -->
         </trim>

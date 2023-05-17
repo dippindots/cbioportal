@@ -188,6 +188,12 @@ public class StudyViewServiceImpl implements StudyViewService {
         Map<String, List<MolecularProfile>> molecularProfileMap = molecularProfileUtil
             .categorizeMolecularProfilesByStableIdSuffixes(molecularProfiles);
 
+        //  Change this part of code
+        //  Input (three parameters)
+        //        1. StudyViewFilter
+        //        2. molecularProfileIds
+        //        3. stableIds
+        
         List<GenericAssayData> data = profileTypes.stream().flatMap(profileType -> {
             // We need to create a map for mapping from studyId to profileId
             Map<String, String> studyIdToMolecularProfileIdMap = molecularProfileMap
