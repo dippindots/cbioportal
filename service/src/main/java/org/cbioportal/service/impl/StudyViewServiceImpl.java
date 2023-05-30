@@ -187,12 +187,6 @@ public class StudyViewServiceImpl implements StudyViewService {
 
         Map<String, List<MolecularProfile>> molecularProfileMap = molecularProfileUtil
             .categorizeMolecularProfilesByStableIdSuffixes(molecularProfiles);
-
-        //  Change this part of code
-        //  Input (three parameters)
-        //        1. StudyViewFilter
-        //        2. molecularProfileIds
-        //        3. stableIds
         
         List<GenericAssayData> data = profileTypes.stream().flatMap(profileType -> {
             // We need to create a map for mapping from studyId to profileId
@@ -250,6 +244,79 @@ public class StudyViewServiceImpl implements StudyViewService {
 
                 GenericAssayDataCountItem genericAssayDataCountItem = new GenericAssayDataCountItem();
                 genericAssayDataCountItem.setStableId(entry.getKey());
+                genericAssayDataCountItem.setCounts(counts);
+                return genericAssayDataCountItem;
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GenericAssayDataCountItem> fetchGenericAssayDataCountsClickhouse(StudyViewFilter studyViewFilter,
+                                                                                 List<String> stableIds, List<String> profileTypes) {
+        if (stableIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Sample> filteredSamples = getFilteredSamplesFromColumnstore(studyViewFilter);
+        
+        // TODO: This is a temporary solution, if we keep this part, we should remove the sample filtering logic from the xml file
+        List<String> studyIds = filteredSamples.stream().map(Sample::getCancerStudyIdentifier).collect(Collectors.toList());
+        
+        // Get data from fetchGenericAssayData service
+        List<MolecularProfile> molecularProfiles = molecularProfileService.getMolecularProfilesInStudies(studyIds,
+            "SUMMARY");
+
+        Map<String, List<MolecularProfile>> molecularProfileMap = molecularProfileUtil
+            .categorizeMolecularProfilesByStableIdSuffixes(molecularProfiles);
+
+        //  Change this part of code
+        //  Input (three parameters)
+        //        1. StudyViewFilter
+        //        2. molecularProfileIds
+        //        3. stableIds
+
+        List<GenericAssayDataCount> data = profileTypes.stream().flatMap(profileType -> {
+            // We need to create a map for mapping from studyId to profileId
+            Map<String, String> studyIdToMolecularProfileIdMap = molecularProfileMap
+                .getOrDefault(profileType, new ArrayList<>())
+                .stream().collect(Collectors.toMap(MolecularProfile::getCancerStudyIdentifier,
+                    MolecularProfile::getStableId));
+
+            List<String> mappedProfileIds = new ArrayList<>();
+
+            for (int i = 0; i < studyIds.size(); i++) {
+                mappedProfileIds.add(studyIdToMolecularProfileIdMap.get(i));
+            }
+
+            try {
+                return studyViewRepository.getGenericAssayCountFromClickhouse(studyViewFilter, mappedProfileIds, stableIds).stream();
+            } catch (Exception e) {
+                return new ArrayList<GenericAssayDataCount>().stream();
+            }
+        }).collect(Collectors.toList());
+
+        Map<String, List<GenericAssayDataCount>> genericAssayDataCountGroupedByStableId = data.stream().filter(g -> StringUtils.isNotEmpty(g.getValue()) && !g.getValue().equals("NA")).collect(Collectors.groupingBy(GenericAssayDataCount::getGenericEntityStableId));
+
+        return genericAssayDataCountGroupedByStableId
+            .keySet()
+            .stream()
+            .map(key -> {
+                int totalCount = 0;
+                List<GenericAssayDataCount> counts = genericAssayDataCountGroupedByStableId.get(key);
+                for(int i = 0; i < counts.size(); i++){
+                    totalCount += counts.get(i).getCount();
+                }
+                int naCount = filteredSamples.size() - totalCount;
+
+                if (naCount > 0) {
+                    GenericAssayDataCount dataCount = new GenericAssayDataCount();
+                    dataCount.setValue("NA");
+                    dataCount.setCount(naCount);
+                    counts.add(dataCount);
+                }
+
+                GenericAssayDataCountItem genericAssayDataCountItem = new GenericAssayDataCountItem();
+                genericAssayDataCountItem.setStableId(key);
                 genericAssayDataCountItem.setCounts(counts);
                 return genericAssayDataCountItem;
             })

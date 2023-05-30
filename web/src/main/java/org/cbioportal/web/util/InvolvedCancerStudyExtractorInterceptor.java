@@ -98,6 +98,8 @@ public class InvolvedCancerStudyExtractorInterceptor extends HandlerInterceptorA
     public static final String STUDY_VIEW_GENOMICL_DATA_BIN_COUNTS_PATH = "/genomic-data-bin-counts/fetch";
     public static final String STUDY_VIEW_GENERIC_ASSAY_DATA_BIN_COUNTS_PATH = "/generic-assay-data-bin-counts/fetch";
     public static final String STUDY_VIEW_GENERIC_ASSAY_DATA_COUNTS_PATH = "/generic-assay-data-counts/fetch";
+    
+    public static final String STUDY_VIEW_GENERIC_ASSAY_DATA_COUNTS_CLICKHOUSE_PATH = "/generic-assay-data-counts-clickhouse/fetch";
     public static final String STUDY_VIEW_CLINICAL_DATA_COUNTS_PATH = "/clinical-data-counts/fetch";
     public static final String STUDY_VIEW_CUSTOM_DATA_COUNTS_PATH = "/custom-data-counts/fetch";
     public static final String STUDY_VIEW_CLINICAL_DATA_DENSITY_PATH = "/clinical-data-density-plot/fetch";
@@ -154,6 +156,8 @@ public class InvolvedCancerStudyExtractorInterceptor extends HandlerInterceptorA
             return extractAttributesFromGenericAssayDataBinCountFilter(request);
         } else if (requestPathInfo.equals(STUDY_VIEW_GENERIC_ASSAY_DATA_COUNTS_PATH)) {
             return extractAttributesFromGenericAssayDataCountFilter(request);
+        } else if (requestPathInfo.equals(STUDY_VIEW_GENERIC_ASSAY_DATA_COUNTS_CLICKHOUSE_PATH)) {
+            return extractAttributesFromGenericAssayDataCountFilterClickhouse(request);
         } else if (Arrays.asList(STUDY_VIEW_CLINICAL_DATA_COUNTS_PATH, STUDY_VIEW_CUSTOM_DATA_COUNTS_PATH)
                 .contains(requestPathInfo)) {
             return extractAttributesFromClinicalDataCountFilter(request);
@@ -527,6 +531,26 @@ public class InvolvedCancerStudyExtractorInterceptor extends HandlerInterceptorA
             if (cacheMapUtil.hasCacheEnabled()) {
                 Collection<String> cancerStudyIdCollection = extractCancerStudyIdsFromGenericAssayDataCountFilter(
                         genericAssayDataCountFilter);
+                LOG.debug("setting involvedCancerStudies to " + cancerStudyIdCollection);
+                request.setAttribute("involvedCancerStudies", cancerStudyIdCollection);
+            }
+        } catch (Exception e) {
+            LOG.error("exception thrown during extraction of genericAssayDataCountFilter: " + e);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean extractAttributesFromGenericAssayDataCountFilterClickhouse(HttpServletRequest request) {
+        try {
+            GenericAssayDataCountFilter genericAssayDataCountFilter = objectMapper
+                .readValue(request.getInputStream(), GenericAssayDataCountFilter.class);
+            LOG.debug("extracted genericAssayDataCountFilter: " + genericAssayDataCountFilter.toString());
+            LOG.debug("setting interceptedGenericAssayDataCountFilterClickhouse to " + genericAssayDataCountFilter);
+            request.setAttribute("interceptedGenericAssayDataCountFilterClickhouse", genericAssayDataCountFilter);
+            if (cacheMapUtil.hasCacheEnabled()) {
+                Collection<String> cancerStudyIdCollection = extractCancerStudyIdsFromGenericAssayDataCountFilter(
+                    genericAssayDataCountFilter);
                 LOG.debug("setting involvedCancerStudies to " + cancerStudyIdCollection);
                 request.setAttribute("involvedCancerStudies", cancerStudyIdCollection);
             }

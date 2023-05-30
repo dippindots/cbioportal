@@ -22,6 +22,9 @@ public interface StudyViewService {
         throws StudyNotFoundException;
 
     List<GenericAssayDataCountItem> fetchGenericAssayDataCounts(List<String> sampleIds, List<String> studyIds, List<String> stableIds, List<String> profileTypes);
+    
+    List<GenericAssayDataCountItem> fetchGenericAssayDataCountsClickhouse(StudyViewFilter studyViewFilter,
+                                                                          List<String> stableIds, List<String> profileTypes);
 
     List<Sample> getFilteredSamplesFromColumnstore(StudyViewFilter studyViewFilter);
 
