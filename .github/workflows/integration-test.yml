@@ -43,7 +43,7 @@ jobs:
         run: |
           cd ./data && ./init.sh && rm -rf ./studies/* && cd ../config && \
           cat $PORTAL_SOURCE_DIR/portal/target/portal/WEB-INF/classes/portal.properties | \
-              sed 's|db.connection_string=.*|db.connection_string=jdbc:mysql://cbioportal-database-container:3306/cbioportal?useSSL=false|g' \
+              sed 's|db.connection_string=.*|db.connection_string=jdbc:mysql://cbioportal-database:3306/cbioportal?useSSL=false|g' \
               > portal.properties
       - name: 'Start cbioportal-docker-compose'
         working-directory: ./cbioportal-docker-compose
