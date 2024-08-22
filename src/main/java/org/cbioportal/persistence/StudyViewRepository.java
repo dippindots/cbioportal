@@ -8,6 +8,7 @@ import org.cbioportal.model.ClinicalDataCount;
 import org.cbioportal.model.ClinicalEventTypeCount;
 import org.cbioportal.model.CopyNumberCountByGene;
 import org.cbioportal.model.GenomicDataCount;
+import org.cbioportal.model.MolecularProfile;
 import org.cbioportal.model.Sample;
 import org.cbioportal.web.parameter.ClinicalDataType;
 import org.cbioportal.web.parameter.StudyViewFilter;
@@ -33,7 +34,7 @@ public interface StudyViewRepository {
     List<GenomicDataCount> getGenomicDataCounts(StudyViewFilter studyViewFilter);
     
     List<ClinicalAttribute> getClinicalAttributes();
-
+    
     Map<String, ClinicalDataType> getClinicalAttributeDatatypeMap();
 
     List<CaseListDataCount> getCaseListDataCounts(StudyViewFilter studyViewFilter);
@@ -47,4 +48,10 @@ public interface StudyViewRepository {
     int getTotalProfiledCountsByAlterationType(StudyViewFilter studyViewFilter, String alterationType);
     
     List<ClinicalEventTypeCount> getClinicalEventTypeCounts(StudyViewFilter studyViewFilter);
+
+    List<ClinicalDataCount> getGenomicDataBinCounts(StudyViewFilter studyViewFilter, List<String> filteredAttributes);
+
+    List<ClinicalDataCount> getGenericAssayDataBinCounts(StudyViewFilter studyViewFilter, List<String> filteredAttributes);
+
+    List<MolecularProfile> getGenericAssayProfiles();
 }

@@ -35,5 +35,9 @@ public interface StudyViewColumnarService {
     List<GenomicDataCount> getGenomicDataCounts(StudyViewFilter studyViewFilter);
 
     List<ClinicalEventTypeCount> getClinicalEventTypeCounts(StudyViewFilter studyViewFilter);
+
+    List<ClinicalDataCountItem> getGenomicDataBinCounts(StudyViewFilter studyViewFilter, List<String> filteredAttributes);
+
+    List<ClinicalDataCountItem> getGenericAssayDataBinCounts(StudyViewFilter studyViewFilter, List<String> filteredAttributes);
     
 }

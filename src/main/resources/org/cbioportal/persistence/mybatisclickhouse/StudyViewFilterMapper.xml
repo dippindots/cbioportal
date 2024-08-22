@@ -105,6 +105,35 @@
                     </include>
                 </foreach>
             </if>
+            <!-- TODO: update return type when refactoring this code -->
+            <!-- TODO: add patient level data filtering -->
+            <if test="categorizedClinicalDataCountFilter.getSampleNumericalGenomicDataFilters() != null and !categorizedClinicalDataCountFilter.getSampleNumericalGenomicDataFilters().isEmpty()">
+                <foreach item="genomicDataFilter" collection="categorizedClinicalDataCountFilter.getSampleNumericalGenomicDataFilters()" open="INTERSECT" separator="INTERSECT">
+                    <include refid="numericalGenomicDataCountFilter">
+                        <property name="unique_id" value="sample_unique_id"/>
+                        <property name="table_name" value="genetic_alteration_derived_gaofei"/>
+<!--                        <property name="type" value="sample"/>-->
+                    </include>
+                </foreach>
+            </if>
+            <if test="categorizedClinicalDataCountFilter.getSampleNumericalGenericAssayDataFilters() != null and !categorizedClinicalDataCountFilter.getSampleNumericalGenericAssayDataFilters().isEmpty()">
+                <foreach item="genericAssayDataFilter" collection="categorizedClinicalDataCountFilter.getSampleNumericalGenericAssayDataFilters()" open="INTERSECT" separator="INTERSECT">
+                    <include refid="numericalGenericAssayDataCountFilter">
+                        <property name="unique_id" value="sample_unique_id"/>
+                        <property name="table_name" value="generic_assay_data_derived_gaofei"/>
+<!--                        <property name="type" value="sample"/>-->
+                    </include>
+                </foreach>
+            </if>
+            <if test="categorizedClinicalDataCountFilter.getSampleCategoricalGenericAssayDataFilters() != null and !categorizedClinicalDataCountFilter.getSampleCategoricalGenericAssayDataFilters().isEmpty()">
+                <foreach item="genericAssayDataFilter" collection="categorizedClinicalDataCountFilter.getSampleCategoricalGenericAssayDataFilters()" open="INTERSECT" separator="INTERSECT">
+                    <include refid="categoricalGenericAssayDataCountFilter">
+                        <property name="unique_id" value="sample_unique_id"/>
+                        <property name="table_name" value="generic_assay_data_derived_gaofei"/>
+                        <!--                        <property name="type" value="sample"/>-->
+                    </include>
+                </foreach>
+            </if>
             <!-- ... extend for other elements of the StudyViewFilter object -->
         </trim>
     </sql>
@@ -183,6 +212,7 @@
         </foreach>
 
     </sql>
+    
     <sql id="categoricalClinicalDataCountFilter">
         SELECT ${unique_id}
         FROM ${table_name}
@@ -191,6 +221,85 @@
         <foreach item="dataFilterValue" collection="clinicalDataFilter.values" open=" AND ((" separator=") OR (" close="))">
             <trim prefix="" prefixOverrides="AND">
                 AND attribute_value = '${dataFilterValue.value}'
+            </trim>
+        </foreach>
+    </sql>
+
+    <sql id="numericalGenomicDataCountFilter">
+        SELECT ${unique_id}
+        FROM ${table_name}
+        WHERE hugo_gene_symbol = '${genomicDataFilter.hugoGeneSymbol}' AND
+        profile_type='${genomicDataFilter.profileType}'
+        <foreach item="dataFilterValue" collection="genomicDataFilter.values" open=" AND ((" separator=") OR (" close="))">
+            <trim prefix="" prefixOverrides="AND">
+                <if test="dataFilterValue.value eq 'NA'">
+                    AND
+                    <include refid="isAttributeValueNA">
+                        <property name="attribute_value" value="alteration_value"/>
+                    </include>
+                </if>
+                <if test="dataFilterValue.start != null || dataFilterValue.end != null">
+                    AND match(alteration_value, '^[\d\.]+$')
+                    <choose>
+                        <when test="dataFilterValue.start == dataFilterValue.end">
+                            AND abs(minus(cast(alteration_value as float), ${dataFilterValue.start})) &lt; exp(-11)
+                        </when>
+                        <otherwise>
+                            <if test="dataFilterValue.start != null">
+                                AND cast(alteration_value as float) &gt; ${dataFilterValue.start}
+                            </if>
+                            <if test="dataFilterValue.end != null">
+                                AND cast(alteration_value as float) &lt;= ${dataFilterValue.end}
+                            </if>
+                        </otherwise>
+                    </choose>
+                </if>
+            </trim>
+        </foreach>
+    </sql>
+
+    <!-- TODO: update the database scheme to include the data_type column -->
+    <sql id="numericalGenericAssayDataCountFilter">
+        SELECT ${unique_id}
+        FROM ${table_name}
+        WHERE entity_stable_id = '${genericAssayDataFilter.stableId}' AND
+        profile_type='${genericAssayDataFilter.profileType}'
+        <foreach item="dataFilterValue" collection="genericAssayDataFilter.values" open=" AND ((" separator=") OR (" close="))">
+            <trim prefix="" prefixOverrides="AND">
+                <if test="dataFilterValue.value eq 'NA'">
+                    AND
+                    <include refid="isAttributeValueNA">
+                        <property name="attribute_value" value="value"/>
+                    </include>
+                </if>
+                <if test="dataFilterValue.start != null || dataFilterValue.end != null">
+                    AND match(value, '^[\d\.]+$')
+                    <choose>
+                        <when test="dataFilterValue.start == dataFilterValue.end">
+                            AND abs(minus(cast(value as float), ${dataFilterValue.start})) &lt; exp(-11)
+                        </when>
+                        <otherwise>
+                            <if test="dataFilterValue.start != null">
+                                AND cast(value as float) &gt; ${dataFilterValue.start}
+                            </if>
+                            <if test="dataFilterValue.end != null">
+                                AND cast(value as float) &lt;= ${dataFilterValue.end}
+                            </if>
+                        </otherwise>
+                    </choose>
+                </if>
+            </trim>
+        </foreach>
+    </sql>
+
+    <sql id="categoricalGenericAssayDataCountFilter">
+        SELECT ${unique_id}
+        FROM ${table_name}
+        WHERE entity_stable_id = '${genericAssayDataFilter.stableId}' AND
+        profile_type='${genericAssayDataFilter.profileType}'
+        <foreach item="dataFilterValue" collection="genericAssayDataFilter.values" open=" AND ((" separator=") OR (" close="))">
+            <trim prefix="" prefixOverrides="AND">
+                AND value = '${dataFilterValue.value}'
             </trim>
         </foreach>
     </sql>
