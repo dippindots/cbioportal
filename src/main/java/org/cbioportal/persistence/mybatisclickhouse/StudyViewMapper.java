@@ -12,6 +12,7 @@ import org.cbioportal.model.GenePanelToGene;
 import org.cbioportal.model.GenomicDataCount;
 import org.cbioportal.model.GenomicDataCountItem;
 import org.cbioportal.model.PatientTreatment;
+import org.cbioportal.model.MolecularProfile;
 import org.cbioportal.model.Sample;
 import org.cbioportal.model.SampleTreatment;
 import org.cbioportal.persistence.helper.AlterationFilterHelper;
@@ -65,4 +66,12 @@ public interface StudyViewMapper {
     Map<String, Integer> getMutationCounts(StudyViewFilterHelper studyViewFilterHelper, GenomicDataFilter genomicDataFilter);
 
     List<GenomicDataCountItem> getMutationCountsByType(StudyViewFilterHelper studyViewFilterHelper, List<GenomicDataFilter> genomicDataFilters);
+
+    // TODO: update this with new parameters
+    List<ClinicalDataCount> getGenomicDataBinCounts(StudyViewFilter studyViewFilter, CategorizedClinicalDataCountFilter categorizedClinicalDataCountFilter,
+                                                  boolean applyPatientIdFilters, List<String> attributeIds, List<String> filteredAttributeValues);
+    List<ClinicalDataCount> getGenericAssayDataBinCounts(StudyViewFilter studyViewFilter, CategorizedClinicalDataCountFilter categorizedClinicalDataCountFilter,
+                                                    boolean applyPatientIdFilters, List<String> attributeIds, List<String> filteredAttributeValues);
+
+    List<MolecularProfile> getGenericAssayProfiles();
 }
