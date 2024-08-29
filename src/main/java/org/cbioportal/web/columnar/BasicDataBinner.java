@@ -67,12 +67,11 @@ public class BasicDataBinner {
 
         // we need to fetch data for the partial filter in order to generate the bins for initial state
         // we use the filtered data to calculate the counts for each bin, we do not regenerate bins for the filtered data
-        // TODO: update this before review, should create a function for this
         List<ClinicalDataCountItem> unfilteredClinicalDataCounts;
         List<ClinicalDataCountItem> filteredClinicalDataCounts;
         Map<String, ClinicalDataType> attributeDatatypeMap;
         switch (dataBinCountFilter) {
-            // TODO: this is to support clinical data, but clinical data is not using this now. We should update controller to use this method later
+            // TODO: first case is to support clinical data, but clinical data is not using this now. We should update controller to use this method later
             case ClinicalDataBinCountFilter clinicalDataBinCountFilter -> {
                 unfilteredClinicalDataCounts = studyViewColumnarService.getClinicalDataCounts(partialFilter, uniqueKeys);
                 filteredClinicalDataCounts = studyViewColumnarService.getClinicalDataCounts(studyViewFilter, uniqueKeys);
@@ -112,7 +111,7 @@ public class BasicDataBinner {
         // Define result variables
         List<U> resultDataBins = Collections.emptyList();
 
-        // TODO: need to update attributeDatatypeMap to ignore patient level data
+        // TODO: need to update attributeDatatypeMap to include patient level data for Generic Assay Profiles
         if (dataBinMethod == DataBinMethod.STATIC) {
             if (!unfilteredClinicalData.isEmpty()) {
                 resultDataBins = calculateStaticDataBins(
@@ -124,7 +123,7 @@ public class BasicDataBinner {
                 );
             }
         }
-        // TODO: need to update attributeDatatypeMap to ignore patient level data
+        // TODO: need to update attributeDatatypeMap to include patient level data for Generic Assay Profiles
         else { // dataBinMethod == DataBinMethod.DYNAMIC
             // TODO we should consider removing dynamic binning support
             //  we never use dynamic binning in the frontend because number of bins and the bin ranges can change 
