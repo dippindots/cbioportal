@@ -452,35 +452,6 @@
             )
         </where>
     </select>
-
-    <select id="getGenomicDataBinCounts" resultType="org.cbioportal.model.ClinicalDataCount">
-        SELECT
-        concat(hugo_gene_symbol, profile_type) as attributeId,
-        <include refid="normalizeAttributeValueNA">
-            <property name="attribute_value" value="alteration_value"/>
-            <property name="as_value" value="value"/>
-        </include>,
-        count(value) as count
-        FROM genetic_alteration_derived_gaofei
-        <where>
---             type='sample' AND
-            <include refid="applyStudyViewFilter">
-                <property name="filter_type" value="'SAMPLE_ID_ONLY'"/>
-            </include>
-<!--            <if test="filteredAttributeValues != null and !filteredAttributeValues.isEmpty()">-->
-<!--                AND UPPER(value) NOT IN-->
-<!--                <foreach item="filteredAttributeValue" collection="filteredAttributeValues" open="(" separator="," close=")">-->
-<!--                    #{filteredAttributeValue}-->
-<!--                </foreach>-->
-<!--            </if>-->
-            AND concat(hugo_gene_symbol, profile_type) IN
-            <foreach item="attributeId" collection="attributeIds" open="(" separator="," close=")">
-                #{attributeId}
-            </foreach>
-        </where>
-        GROUP BY hugo_gene_symbol, profile_type,
-        value
-    </select>
     
    <resultMap id="PatientTreatment" type="org.cbioportal.model.PatientTreatment">
       <constructor>
@@ -585,14 +556,41 @@
         </where>
         GROUP BY treatments.treatment;
     </select>
+
+    <select id="getGenomicDataBinCounts" resultType="org.cbioportal.model.ClinicalDataCount">
+        SELECT
+        concat(hugo_gene_symbol, profile_type) as attributeId,
+        <include refid="normalizeAttributeValue">
+            <property name="attribute_value" value="alteration_value"/>
+        </include> as value,
+        count(value) as count
+        FROM genetic_alteration_derived_gaofei
+        <where>
+            --             type='sample' AND
+            <include refid="applyStudyViewFilter">
+                <property name="filter_type" value="'SAMPLE_ID_ONLY'"/>
+            </include>
+            <!--            <if test="filteredAttributeValues != null and !filteredAttributeValues.isEmpty()">-->
+            <!--                AND UPPER(value) NOT IN-->
+            <!--                <foreach item="filteredAttributeValue" collection="filteredAttributeValues" open="(" separator="," close=")">-->
+            <!--                    #{filteredAttributeValue}-->
+            <!--                </foreach>-->
+            <!--            </if>-->
+            AND concat(hugo_gene_symbol, profile_type) IN
+            <foreach item="attributeId" collection="attributeIds" open="(" separator="," close=")">
+                #{attributeId}
+            </foreach>
+        </where>
+        GROUP BY hugo_gene_symbol, profile_type,
+        value
+    </select>
     
     <select id="getGenericAssayDataBinCounts" resultType="org.cbioportal.model.ClinicalDataCount">
         SELECT
         concat(entity_stable_id, profile_type) as attributeId,
-        <include refid="normalizeAttributeValueNA">
+        <include refid="normalizeAttributeValue">
             <property name="attribute_value" value="value"/>
-            <property name="as_value" value="value"/>
-        </include>,
+        </include> as value,
         count(value) as count
         FROM generic_assay_data_derived_gaofei
         <where>

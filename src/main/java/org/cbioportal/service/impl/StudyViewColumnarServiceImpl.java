@@ -83,7 +83,7 @@ public class StudyViewColumnarServiceImpl implements StudyViewColumnarService {
 
     @Override
     public List<ClinicalDataCountItem> getGenomicDataBinCounts(StudyViewFilter studyViewFilter, List<String> filteredAttributes) {
-        return studyViewRepository.getGenomicDataBinCounts(studyViewFilter, filteredAttributes)
+        return studyViewRepository.getGenomicDataBinCounts(createContext(studyViewFilter), filteredAttributes)
             .stream().collect(Collectors.groupingBy(ClinicalDataCount::getAttributeId))
             .entrySet().parallelStream().map(e -> {
                 ClinicalDataCountItem item = new ClinicalDataCountItem();
@@ -95,7 +95,7 @@ public class StudyViewColumnarServiceImpl implements StudyViewColumnarService {
 
     @Override
     public List<ClinicalDataCountItem> getGenericAssayDataBinCounts(StudyViewFilter studyViewFilter, List<String> filteredAttributes) {
-        return studyViewRepository.getGenericAssayDataBinCounts(studyViewFilter, filteredAttributes)
+        return studyViewRepository.getGenericAssayDataBinCounts(createContext(studyViewFilter), filteredAttributes)
             .stream().collect(Collectors.groupingBy(ClinicalDataCount::getAttributeId))
             .entrySet().parallelStream().map(e -> {
                 ClinicalDataCountItem item = new ClinicalDataCountItem();

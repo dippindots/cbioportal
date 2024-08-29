@@ -544,7 +544,6 @@ public class StudyViewColumnStoreController {
         @RequestAttribute(required = false, value = "involvedCancerStudies") Collection<String> involvedCancerStudies,
         @RequestAttribute(required = false, value = "interceptedGenomicDataBinCountFilter") GenomicDataBinCountFilter interceptedGenomicDataBinCountFilter
     ) {
-        // TODO: create a general data binner that can be used in clinical data, genomic data and generic assay data endpoints
         List<GenomicDataBin> genomicDataBins = basicDataBinner.getDataBins(
             dataBinMethod,
             interceptedGenomicDataBinCountFilter,
@@ -564,7 +563,6 @@ public class StudyViewColumnStoreController {
         @RequestAttribute(required = false, value = "involvedCancerStudies") Collection<String> involvedCancerStudies,
         @RequestAttribute(required = false, value = "interceptedGenericAssayDataBinCountFilter") GenericAssayDataBinCountFilter interceptedGenericAssayDataBinCountFilter
     ) {
-        // TODO: create a general data binner that can be used in clinical data, genomic data and generic assay data endpoints
         List<GenericAssayDataBin> genericAssayDataBins = basicDataBinner.getDataBins(
             dataBinMethod,
             interceptedGenericAssayDataBinCountFilter,

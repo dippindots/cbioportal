@@ -68,10 +68,8 @@ public interface StudyViewMapper {
     List<GenomicDataCountItem> getMutationCountsByType(StudyViewFilterHelper studyViewFilterHelper, List<GenomicDataFilter> genomicDataFilters);
 
     // TODO: update this with new parameters
-    List<ClinicalDataCount> getGenomicDataBinCounts(StudyViewFilter studyViewFilter, CategorizedClinicalDataCountFilter categorizedClinicalDataCountFilter,
-                                                  boolean applyPatientIdFilters, List<String> attributeIds, List<String> filteredAttributeValues);
-    List<ClinicalDataCount> getGenericAssayDataBinCounts(StudyViewFilter studyViewFilter, CategorizedClinicalDataCountFilter categorizedClinicalDataCountFilter,
-                                                    boolean applyPatientIdFilters, List<String> attributeIds, List<String> filteredAttributeValues);
+    List<ClinicalDataCount> getGenomicDataBinCounts(StudyViewFilterHelper studyViewFilterHelper, List<String> attributeIds);
+    List<ClinicalDataCount> getGenericAssayDataBinCounts(StudyViewFilterHelper studyViewFilterHelper, List<String> attributeIds);
 
     List<MolecularProfile> getGenericAssayProfiles();
 }
