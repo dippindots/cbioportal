@@ -722,34 +722,25 @@ public class StudyViewFilterApplier {
 
     public <T extends DataBinCountFilter, S extends DataBinFilter, U extends DataBin> List<U> getDataBins(
         DataBinMethod dataBinMethod, T dataBinCountFilter) {
-        // get data bin filters based on the type of the filter
-        // either Genomic data or Generic Assay data
         List<S> dataBinFilters = fetchDataBinFilters(dataBinCountFilter);
-        
         StudyViewFilter studyViewFilter = dataBinCountFilter.getStudyViewFilter();
 
         if (dataBinFilters.size() == 1) {
             removeSelfFromFilter(dataBinFilters.get(0), studyViewFilter);
         }
 
-        // define result variables
         List<U> resultDataBins;
         List<String> filteredSampleIds = new ArrayList<>();
         List<String> filteredStudyIds = new ArrayList<>();
         
-        // fetchData will fetch data from different services based on the type of the filter
-        // either Genomic data or Generic Assay data
-        // data been fetched and cast as Clinical data, then 
         List<Binnable> filteredData = fetchData(dataBinCountFilter, studyViewFilter, filteredSampleIds,
             filteredStudyIds);
 
         List<String> filteredUniqueSampleKeys = getUniqkeyKeys(filteredStudyIds, filteredSampleIds);
 
-        // data grouped by entity id
         Map<String, List<Binnable>> filteredClinicalDataByAttributeId = filteredData.stream()
             .collect(Collectors.groupingBy(Binnable::getAttrId));
-
-        // Dynamic is the default binning method
+        
         if (dataBinMethod == DataBinMethod.STATIC) {
 
             StudyViewFilter filter = studyViewFilter == null ? null : new StudyViewFilter();
@@ -760,8 +751,6 @@ public class StudyViewFilterApplier {
 
             List<String> unfilteredSampleIds = new ArrayList<>();
             List<String> unfilteredStudyIds = new ArrayList<>();
-            // get unfiltered data
-            // TODO: maybe we can try to optimize this step
             List<Binnable> unfilteredData = fetchData(dataBinCountFilter, filter, unfilteredSampleIds,
                 unfilteredStudyIds);
 

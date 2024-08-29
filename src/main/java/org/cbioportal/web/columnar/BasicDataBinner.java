@@ -72,10 +72,10 @@ public class BasicDataBinner {
         List<ClinicalDataCountItem> filteredClinicalDataCounts;
         Map<String, ClinicalDataType> attributeDatatypeMap;
         switch (dataBinCountFilter) {
+            // TODO: this is to support clinical data, but clinical data is not using this now. We should update controller to use this method later
             case ClinicalDataBinCountFilter clinicalDataBinCountFilter -> {
                 unfilteredClinicalDataCounts = studyViewColumnarService.getClinicalDataCounts(partialFilter, uniqueKeys);
                 filteredClinicalDataCounts = studyViewColumnarService.getClinicalDataCounts(studyViewFilter, uniqueKeys);
-                // TODO: only do this for clinical data, because all genomic data and generic assay data are currently no patient level data
                 attributeDatatypeMap = studyViewColumnarService.getClinicalAttributeDatatypeMap();
             }
             case GenomicDataBinCountFilter genomicDataBinCountFilter -> {

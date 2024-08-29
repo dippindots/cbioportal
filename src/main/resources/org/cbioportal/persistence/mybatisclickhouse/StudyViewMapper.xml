@@ -566,16 +566,9 @@
         count(value) as count
         FROM genetic_alteration_derived_gaofei
         <where>
-            --             type='sample' AND
             <include refid="applyStudyViewFilter">
                 <property name="filter_type" value="'SAMPLE_ID_ONLY'"/>
             </include>
-            <!--            <if test="filteredAttributeValues != null and !filteredAttributeValues.isEmpty()">-->
-            <!--                AND UPPER(value) NOT IN-->
-            <!--                <foreach item="filteredAttributeValue" collection="filteredAttributeValues" open="(" separator="," close=")">-->
-            <!--                    #{filteredAttributeValue}-->
-            <!--                </foreach>-->
-            <!--            </if>-->
             AND concat(hugo_gene_symbol, profile_type) IN
             <foreach item="attributeId" collection="attributeIds" open="(" separator="," close=")">
                 #{attributeId}
@@ -594,16 +587,9 @@
         count(value) as count
         FROM generic_assay_data_derived_gaofei
         <where>
-            --             type='sample' AND
             <include refid="applyStudyViewFilter">
                 <property name="filter_type" value="'SAMPLE_ID_ONLY'"/>
             </include>
-            <!--            <if test="filteredAttributeValues != null and !filteredAttributeValues.isEmpty()">-->
-            <!--                AND UPPER(value) NOT IN-->
-            <!--                <foreach item="filteredAttributeValue" collection="filteredAttributeValues" open="(" separator="," close=")">-->
-            <!--                    #{filteredAttributeValue}-->
-            <!--                </foreach>-->
-            <!--            </if>-->
             AND concat(entity_stable_id, profile_type) IN
             <foreach item="attributeId" collection="attributeIds" open="(" separator="," close=")">
                 #{attributeId}
