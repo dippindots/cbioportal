@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.5.0.761265261734">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.6.0.796422669310">
 
     <!-- See retype.com -->
-    <meta name="generator" content="Retype 3.5.0">
+    <meta name="generator" content="Retype 3.6.0">
 
     <!-- Primary Meta Tags -->
     <title>Import data with Docker</title>
@@ -31,12 +31,12 @@
     <script data-cfasync="false">(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
     <link href="../../../images/cbio-logo.png" rel="icon">
-    <link href="../../../resources/css/retype.css?v=3.5.0.761265261734" rel="stylesheet">
+    <link href="../../../resources/css/retype.css?v=3.6.0.796422669310" rel="stylesheet">
 
-    <script data-cfasync="false" src="../../../resources/js/config.js?v=3.5.0.761265261734" data-turbo-eval="false" defer></script>
-    <script data-cfasync="false" src="../../../resources/js/retype.js?v=3.5.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../../../resources/js/lunr.js?v=3.5.0.761265261734" data-turbo-eval="false" defer></script>
-    <script id="prism-js" data-cfasync="false" src="../../../resources/js/prism.js?v=3.5.0.761265261734" defer></script>
+    <script data-cfasync="false" src="../../../resources/js/config.js?v=3.6.0.796422669310" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../../../resources/js/retype.js?v=3.6.0" data-turbo-eval="false" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../../../resources/js/lunr.js?v=3.6.0.796422669310" data-turbo-eval="false" defer></script>
+    <script id="prism-js" data-cfasync="false" src="../../../resources/js/prism.js?v=3.6.0.796422669310" defer></script>
 
     <link rel="stylesheet" href="/static/custom.css"></link>
 </head>
@@ -103,6 +103,16 @@
                                         </g>
                                     </svg>
                                     <span>Google Group</span>
+                                </a>
+                            </li>
+                            <li class="mr-6">
+                                <a class="py-2 md:mb-0 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-blue-500 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200" href="../../../donate/">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="mb-px mr-1" width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                                        <g fill="currentColor">
+                                            <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 0 1-.686 0 16.709 16.709 0 0 1-.465-.252 31.147 31.147 0 0 1-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0 1 14 20.408Z"/>
+                                        </g>
+                                    </svg>
+                                    <span>Donate</span>
                                 </a>
                             </li>
         
@@ -215,6 +225,16 @@
                                             <span>Google Group</span>
                                         </a>
                                     </li>
+                                    <li class="mr-6">
+                                        <a class="block py-1 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-blue-500 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200" href="../../../donate/">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px mr-1" width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                                                <g fill="currentColor">
+                                                    <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 0 1-.686 0 16.709 16.709 0 0 1-.465-.252 31.147 31.147 0 0 1-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0 1 14 20.408Z"/>
+                                                </g>
+                                            </svg>
+                                            <span>Donate</span>
+                                        </a>
+                                    </li>
             
                                 </ul>
                             </nav>
@@ -263,14 +283,14 @@
 <p>To import gene panels for your study, please reference the example commands in <a href="../example_commands/#importing-gene-panel">this file</a></p>
 <p>These are the commands for importing <code v-pre>study_es_0</code> gene panels (<code v-pre>data_gene_panel_testpanel1</code> and <code v-pre>data_gene_panel_testpanel2</code>):</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre class="language-bash"><code v-pre class="language-bash">docker-compose run \
+<pre class="language-bash"><code v-pre class="language-bash">docker compose run \
     cbioportal \
-    bash -c 'cd /cbioportal/core/src/main/scripts/ &amp;&amp; ./importGenePanel.pl --data /cbioportal/core/src/test/scripts/test_data/study_es_0/data_gene_panel_testpanel1.txt'</code></pre>
+    bash -c 'cd /core/scripts/ &amp;&amp; ./importGenePanel.pl --data /cbioportal/test/study_es_0/data_gene_panel_testpanel1.txt'</code></pre>
 </doc-codeblock></div>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre class="language-bash"><code v-pre class="language-bash">docker-compose run \
+<pre class="language-bash"><code v-pre class="language-bash">docker compose run \
     cbioportal \
-    bash -c 'cd /cbioportal/core/src/main/scripts/ &amp;&amp; ./importGenePanel.pl --data /cbioportal/core/src/test/scripts/test_data/study_es_0/data_gene_panel_testpanel2.txt'</code></pre>
+    bash -c 'cd /core/scripts/ &amp;&amp; ./importGenePanel.pl --data /cbioportal/test/study_es_0/data_gene_panel_testpanel2.txt'</code></pre>
 </doc-codeblock></div>
 <doc-anchor-target id="step-2---import-data">
     <h4>
@@ -281,9 +301,9 @@
 <p>To import data for your study, please reference the example commands in <a href="../example_commands/#importing-data">this file</a></p>
 <p>Command for importing <code v-pre>study_es_0</code> data:</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre class="language-bash"><code v-pre class="language-bash">docker-compose run cbioportal metaImport.py -u http://cbioportal:8080 -s /cbioportal/core/src/test/scripts/test_data/study_es_0 -o</code></pre>
+<pre class="language-bash"><code v-pre class="language-bash">docker compose run cbioportal metaImport.py -u http://cbioportal:8080 -s /cbioportal/test/study_es_0 -o</code></pre>
 </doc-codeblock></div>
-<p><span class="docs-emoji">&#x26A0;&#xFE0F;</span> after importing a study, remember to restart <code v-pre>cbioportal</code> to see the study on the home page. Run <code v-pre>docker-compose restart cbioportal</code>.</p>
+<p><span class="docs-emoji">&#x26A0;&#xFE0F;</span> after importing a study, remember to restart <code v-pre>cbioportal</code> to see the study on the home page. Run <code v-pre>docker compose restart cbioportal</code>.</p>
 <p>You have now imported the test study <code v-pre>study_es_0</code>. Note that this study is included inside the cbioportal container. The process for adding a study that is outside of the container is similar. Just make sure to add the data files in the <code v-pre>./study</code> folder. This folder is mounted as <code v-pre>/study/</code> inside of the container.</p>
 <doc-anchor-target id="frequently-asked-questions">
     <h3>
@@ -315,7 +335,7 @@
 </doc-anchor-target>
 <p>Remember to restart the <code v-pre>cbioportal</code> after data imported.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre class="language-bash"><code v-pre class="language-bash">docker-compose restart cbioportal</code></pre>
+<pre class="language-bash"><code v-pre class="language-bash">docker compose restart cbioportal</code></pre>
 </doc-codeblock></div>
 <doc-anchor-target id="import-grch38-data">
     <h4>
@@ -367,7 +387,7 @@
                                     <ul class="flex flex-wrap items-center text-sm">
                                     </ul>
                                 </div>
-                                <div class="docs-copyright py-2 text-gray-500 dark:text-dark-350 text-sm leading-relaxed"><p>© Copyright 2024. All rights reserved.</p></div>
+                                <div class="docs-copyright py-2 text-gray-500 dark:text-dark-350 text-sm leading-relaxed"><p>© Copyright 2025. All rights reserved.</p></div>
                             </footer>
                         </div>
                     </div>

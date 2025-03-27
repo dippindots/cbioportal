@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.5.0.761265261734">
+    <meta name="turbo-cache-control" content="no-cache" data-turbo-track="reload" data-track-token="3.6.0.796422669310">
 
     <!-- See retype.com -->
-    <meta name="generator" content="Retype 3.5.0">
+    <meta name="generator" content="Retype 3.6.0">
 
     <!-- Primary Meta Tags -->
     <title>Importing the Seed Database</title>
@@ -31,11 +31,11 @@
     <script data-cfasync="false">(function () { var el = document.documentElement, m = localStorage.getItem("doc_theme"), wm = window.matchMedia; if (m === "dark" || (!m && wm && wm("(prefers-color-scheme: dark)").matches)) { el.classList.add("dark") } else { el.classList.remove("dark") } })();</script>
 
     <link href="../../../images/cbio-logo.png" rel="icon">
-    <link href="../../../resources/css/retype.css?v=3.5.0.761265261734" rel="stylesheet">
+    <link href="../../../resources/css/retype.css?v=3.6.0.796422669310" rel="stylesheet">
 
-    <script data-cfasync="false" src="../../../resources/js/config.js?v=3.5.0.761265261734" data-turbo-eval="false" defer></script>
-    <script data-cfasync="false" src="../../../resources/js/retype.js?v=3.5.0" data-turbo-eval="false" defer></script>
-    <script id="lunr-js" data-cfasync="false" src="../../../resources/js/lunr.js?v=3.5.0.761265261734" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../../../resources/js/config.js?v=3.6.0.796422669310" data-turbo-eval="false" defer></script>
+    <script data-cfasync="false" src="../../../resources/js/retype.js?v=3.6.0" data-turbo-eval="false" defer></script>
+    <script id="lunr-js" data-cfasync="false" src="../../../resources/js/lunr.js?v=3.6.0.796422669310" data-turbo-eval="false" defer></script>
 
     <link rel="stylesheet" href="/static/custom.css"></link>
 </head>
@@ -102,6 +102,16 @@
                                         </g>
                                     </svg>
                                     <span>Google Group</span>
+                                </a>
+                            </li>
+                            <li class="mr-6">
+                                <a class="py-2 md:mb-0 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-blue-500 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200" href="../../../donate/">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="mb-px mr-1" width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                                        <g fill="currentColor">
+                                            <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 0 1-.686 0 16.709 16.709 0 0 1-.465-.252 31.147 31.147 0 0 1-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0 1 14 20.408Z"/>
+                                        </g>
+                                    </svg>
+                                    <span>Donate</span>
                                 </a>
                             </li>
         
@@ -214,6 +224,16 @@
                                             <span>Google Group</span>
                                         </a>
                                     </li>
+                                    <li class="mr-6">
+                                        <a class="block py-1 inline-flex items-center text-sm whitespace-nowrap transition-colors duration-200 ease-linear md:text-blue-500 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200" href="../../../donate/">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="mb-px mr-1" width="18" height="18" viewBox="0 0 24 24" role="presentation">
+                                                <g fill="currentColor">
+                                                    <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 0 1-.686 0 16.709 16.709 0 0 1-.465-.252 31.147 31.147 0 0 1-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0 1 14 20.408Z"/>
+                                                </g>
+                                            </svg>
+                                            <span>Donate</span>
+                                        </a>
+                                    </li>
             
                                 </ul>
                             </nav>
@@ -264,29 +284,30 @@
 <ol>
 <li><p>Import the database schema (/db-scripts/src/main/resources/cgds.sql):</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre class="language-none"><code v-pre class="language-none">mysql --user=cbio_user --password=somepassword cbioportal &lt; cgds.sql</code></pre>
+<pre class="language-none"><code v-pre class="language-none">mysql --user=cbio --password=P@ssword1 cbioportal &lt; cgds.sql</code></pre>
 </doc-codeblock></div>
 <p>Note that this may currently fail when using the default character encoding on MySQL 8.0 (<code v-pre>utf8mb4</code>); this is why MySQL 5.7 (which uses <code v-pre>latin1</code>) is recommended.</p>
 </li>
 <li><p>Import the main part of the seed database:</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre class="language-none"><code v-pre class="language-none">mysql --user=cbio_user --password=somepassword cbioportal &lt; seed-cbioportal_RefGenome_vX.Y.Z.sql</code></pre>
+<pre class="language-none"><code v-pre class="language-none">mysql --user=cbio --password=P@ssword1 cbioportal &lt; seed-cbioportal_RefGenome_vX.Y.Z.sql</code></pre>
 </doc-codeblock></div>
 <p><strong>Important:</strong> Replace <code v-pre>seed-cbioportal_RefGenome_vX.Y.Z.sql</code> with the downloaded version of the seed database, such as <code v-pre>seed-cbioportal_hg19_v2.3.1.sql</code> or <code v-pre>seed-cbioportal_mm10_v2.3.1.sql</code>.</p>
 </li>
 <li><p>(Human only) Import the Protein Data Bank (PDB) part of the seed database. This will enable the visualization of PDB structures in the mutation tab. Loading this file takes more time than loading the previous files, and is optional for users that do not require PDB structures.</p>
 <div class="codeblock-wrapper"><doc-codeblock>
-<pre class="language-none"><code v-pre class="language-none">mysql --user=cbio_user --password=somepassword cbioportal &lt; seed-cbioportal_hg19_vX.Y.Z_only-pdb.sql</code></pre>
+<pre class="language-none"><code v-pre class="language-none">mysql --user=cbio --password=P@ssword1 cbioportal &lt; seed-cbioportal_hg19_vX.Y.Z_only-pdb.sql</code></pre>
 </doc-codeblock></div>
 <p><strong>Important:</strong> Replace <code v-pre>seed-cbioportal_hg19_vX.Y.Z_only-pdb.sql</code> with the downloaded version of the PDB database, such as <code v-pre>seed-cbioportal_hg19_v2.3.1_only-pdb.sql</code>.</p>
 </li>
 <li><p>(optional : support for microRNA genomic profiles) Import constructed gene table records for microRNA genomic profiles. Currently, cBioPortal supports the combined display of copy number alterations (generally reported for microRNA precursors) and expression (generally reported for microRNA mature forms) by adding gene table records which represent the combination of microRNA precursor and microRNA mature form. Appropriate aliases are added to the gene_alias table so that both the name of the precursor and the name of the mature form are recognized references to the combination.</p>
-<p>After the code has been successfully configured and built, you can import the needed microRNA records by running the following command from the $PORTAL_HOME directory:</p>
+</li>
+</ol>
+<p>This involves downloading the cBioPortal Core code located <a href="https://github.com/cBioPortal/cbioportal-core">here</a>.</p>
+<p>After the code has been successfully configured and built, you can import the needed microRNA records by running the following command from the cBioPortal core directory:</p>
 <div class="codeblock-wrapper"><doc-codeblock>
 <pre class="language-none"><code v-pre class="language-none">java -cp scripts/target/scripts-*.jar org.mskcc.cbio.portal.scripts.ImportGeneData -microrna core/src/main/resources/micrornas.tsv</code></pre>
 </doc-codeblock></div>
-</li>
-</ol>
 <p><strong>Important:</strong> Please be aware of the version of the seed database. In the <a href="https://github.com/cbioportal/datahub/blob/master/seedDB/README.md">README on datahub</a>, we stated which version of cBioPortal is compatible with the current seed database.</p>
 <p>If the database is older than what cBioPortal is expecting, the system will ask you (during startup or data loading) to migrate the database to a newer version. The migration process is described <a href="../../../updating-your-cbioportal-installation/#running-the-migration-script">here</a>.</p>
 
@@ -332,7 +353,7 @@
                                     <ul class="flex flex-wrap items-center text-sm">
                                     </ul>
                                 </div>
-                                <div class="docs-copyright py-2 text-gray-500 dark:text-dark-350 text-sm leading-relaxed"><p>© Copyright 2024. All rights reserved.</p></div>
+                                <div class="docs-copyright py-2 text-gray-500 dark:text-dark-350 text-sm leading-relaxed"><p>© Copyright 2025. All rights reserved.</p></div>
                             </footer>
                         </div>
                     </div>
