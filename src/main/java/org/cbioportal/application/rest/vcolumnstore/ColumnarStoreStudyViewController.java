@@ -46,6 +46,7 @@ import org.cbioportal.legacy.service.util.ClinicalDataUtil;
 import org.cbioportal.legacy.service.util.CustomDataSession;
 import org.cbioportal.legacy.web.columnar.util.CustomDataFilterUtil;
 import org.cbioportal.legacy.web.columnar.util.NewStudyViewFilterUtil;
+import org.cbioportal.legacy.web.config.annotation.InternalApi;
 import org.cbioportal.legacy.web.parameter.ClinicalDataBinCountFilter;
 import org.cbioportal.legacy.web.parameter.ClinicalDataCountFilter;
 import org.cbioportal.legacy.web.parameter.ClinicalDataFilter;
@@ -73,6 +74,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@InternalApi
 @RestController
 @RequestMapping("/api/column-store")
 public class ColumnarStoreStudyViewController {
@@ -365,7 +367,8 @@ public class ColumnarStoreStudyViewController {
     // this new modified filter is used to fetch sample and patient clinical data.
     // this is required to get the complete violin plot data.
     // filteredSamples reflects only the original unmodified study view filter.
-    // we will need to fetch samples again to get the samples corresponding to this modified filter,
+    // we will need to fetch samples again to get the samples corresponding to this
+    // modified filter,
     // otherwise patient to sample mapping may be incomplete.
     if (studyViewFilter.getClinicalDataFilters() != null) {
       studyViewFilter.getClinicalDataFilters().stream()
@@ -424,9 +427,11 @@ public class ColumnarStoreStudyViewController {
       throws StudyNotFoundException {
     List<GenomicDataFilter> genomicDataFilters = genomicDataCountFilter.getGenomicDataFilters();
     StudyViewFilter studyViewFilter = genomicDataCountFilter.getStudyViewFilter();
-    // when there is only one filter, it means study view is doing a single chart filter operation
+    // when there is only one filter, it means study view is doing a single chart
+    // filter operation
     // remove filter from studyViewFilter to return all data counts
-    // the reason we do this is to make sure after chart get filtered, user can still see unselected
+    // the reason we do this is to make sure after chart get filtered, user can
+    // still see unselected
     // portion of the chart
     if (genomicDataFilters.size() == 1) {
       NewStudyViewFilterUtil.removeSelfFromGenomicDataFilter(
@@ -435,7 +440,8 @@ public class ColumnarStoreStudyViewController {
           studyViewFilter);
     }
 
-    // This endpoint is CNA specific. The name choice of "genomic data" does not imply it support
+    // This endpoint is CNA specific. The name choice of "genomic data" does not
+    // imply it support
     // other genomic data types
     List<GenomicDataCountItem> result =
         studyViewService.getCNACountsByGeneSpecific(studyViewFilter, genomicDataFilters);
@@ -467,9 +473,11 @@ public class ColumnarStoreStudyViewController {
     List<GenericAssayDataFilter> gaFilters =
         genericAssayDataCountFilter.getGenericAssayDataFilters();
     StudyViewFilter studyViewFilter = genericAssayDataCountFilter.getStudyViewFilter();
-    // when there is only one filter, it means study view is doing a single chart filter operation
+    // when there is only one filter, it means study view is doing a single chart
+    // filter operation
     // remove filter from studyViewFilter to return all data counts
-    // the reason we do this is to make sure after chart get filtered, user can still see unselected
+    // the reason we do this is to make sure after chart get filtered, user can
+    // still see unselected
     // portion of the chart
 
     if (gaFilters.size() == 1) {
@@ -499,9 +507,11 @@ public class ColumnarStoreStudyViewController {
           GenomicDataCountFilter genomicDataCountFilter) {
     List<GenomicDataFilter> genomicDataFilters = genomicDataCountFilter.getGenomicDataFilters();
     StudyViewFilter studyViewFilter = genomicDataCountFilter.getStudyViewFilter();
-    // when there is only one filter, it means study view is doing a single chart filter operation
+    // when there is only one filter, it means study view is doing a single chart
+    // filter operation
     // remove filter from studyViewFilter to return all data counts
-    // the reason we do this is to make sure after chart get filtered, user can still see unselected
+    // the reason we do this is to make sure after chart get filtered, user can
+    // still see unselected
     // portion of the chart
     if (genomicDataFilters.size() == 1 && projection == Projection.SUMMARY) {
       NewStudyViewFilterUtil.removeSelfFromMutationDataFilter(
