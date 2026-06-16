@@ -112,3 +112,21 @@ SELECT
 UNION ALL SELECT 'resource_patient', count() FROM resource_patient
 UNION ALL SELECT 'resource_study',   count() FROM resource_study
 UNION ALL SELECT 'resource_data (migrated)', count() FROM resource_data;
+
+-- 4. Replace the transitional UNION-ALL view with a direct read from resource_data.
+--    Now that all legacy data has been backfilled into resource_data, the view no
+--    longer needs to JOIN the three legacy tables on every query.
+CREATE OR REPLACE VIEW resource_data_unified AS
+    SELECT
+        RESOURCE_DATA_ID,
+        RESOURCE_ID,
+        CANCER_STUDY_ID,
+        ENTITY_TYPE,
+        PATIENT_ID,
+        SAMPLE_ID,
+        URL,
+        DISPLAY_NAME,
+        TYPE,
+        METADATA,
+        PRIORITY
+    FROM resource_data;

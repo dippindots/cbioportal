@@ -30,7 +30,7 @@
   </resultMap>
 
   <sql id="ResourceTableFromClause">
-    FROM resource_data rdata
+    FROM resource_data_unified rdata
     INNER JOIN cancer_study cs ON cs.CANCER_STUDY_ID = rdata.CANCER_STUDY_ID
     LEFT JOIN resource_definition rdef
       ON rdef.RESOURCE_ID = rdata.RESOURCE_ID
@@ -215,7 +215,7 @@
       count(*) AS totalCount,
       count(DISTINCT if(rdata.PATIENT_ID IS NULL, NULL, rdata.PATIENT_ID)) AS patientCount,
       count(DISTINCT if(rdata.SAMPLE_ID IS NULL, NULL, rdata.SAMPLE_ID)) AS sampleCount
-    FROM resource_data rdata
+    FROM resource_data_unified rdata
     INNER JOIN cancer_study cs ON cs.CANCER_STUDY_ID = rdata.CANCER_STUDY_ID
     LEFT JOIN resource_definition rdef
       ON rdef.RESOURCE_ID = rdata.RESOURCE_ID

@@ -79,6 +79,8 @@ DROP TABLE IF EXISTS mutation_event;
 DROP TABLE IF EXISTS patient;
 DROP TABLE IF EXISTS reference_genome;
 DROP TABLE IF EXISTS reference_genome_gene;
+DROP VIEW IF EXISTS resource_data_unified;
+DROP TABLE IF EXISTS resource_data;
 DROP TABLE IF EXISTS resource_definition;
 DROP TABLE IF EXISTS resource_patient;
 DROP TABLE IF EXISTS resource_sample;
@@ -454,6 +456,101 @@ CREATE TABLE resource_study (
     `resource_id` String,
     `url` String
 ) ENGINE = MergeTree ORDER BY (internal_id, resource_id, url);
+
+-- Unified resource table for new imports (new data path, starts empty).
+-- Legacy data from resource_sample/resource_patient/resource_study is accessible
+-- via the resource_data_unified view below.
+CREATE TABLE resource_data
+(
+    `RESOURCE_DATA_ID` Int32,
+    `RESOURCE_ID`      String,
+    `CANCER_STUDY_ID`  Int32,
+    `ENTITY_TYPE`      String,           -- 'SAMPLE' | 'PATIENT' | 'STUDY'
+    `PATIENT_ID`       Nullable(String),
+    `SAMPLE_ID`        Nullable(String),
+    `URL`              String,
+    `DISPLAY_NAME`     Nullable(String),
+    `TYPE`             Nullable(String),
+    `METADATA`         Nullable(String), -- JSON object string
+    `PRIORITY`         Int32 DEFAULT 0
+) ENGINE = MergeTree()
+  ORDER BY (CANCER_STUDY_ID, RESOURCE_ID, RESOURCE_DATA_ID);
+
+-- Unified view over new resource_data table AND the three legacy split tables.
+-- Allows the backend to query a single surface without any data migration.
+-- Once the pipelines team runs the backfill (migrate_resource_data.sql), this
+-- view should be replaced with a simple SELECT FROM resource_data.
+CREATE VIEW resource_data_unified AS
+    -- New data written by the importer
+    SELECT
+        RESOURCE_DATA_ID,
+        RESOURCE_ID,
+        CANCER_STUDY_ID,
+        ENTITY_TYPE,
+        PATIENT_ID,
+        SAMPLE_ID,
+        URL,
+        DISPLAY_NAME,
+        TYPE,
+        METADATA,
+        PRIORITY
+    FROM resource_data
+
+    UNION ALL
+
+    -- Legacy SAMPLE-level resources (joined to resolve stable IDs and study)
+    SELECT
+        toInt32(rowNumberInAllBlocks()) + 1000000 AS RESOURCE_DATA_ID,
+        rs.resource_id  AS RESOURCE_ID,
+        toInt32(cs.cancer_study_id) AS CANCER_STUDY_ID,
+        'SAMPLE'        AS ENTITY_TYPE,
+        p.stable_id     AS PATIENT_ID,
+        s.stable_id     AS SAMPLE_ID,
+        rs.url          AS URL,
+        NULL            AS DISPLAY_NAME,
+        NULL            AS TYPE,
+        NULL            AS METADATA,
+        0               AS PRIORITY
+    FROM resource_sample rs
+    INNER JOIN sample       s  ON rs.internal_id  = s.internal_id
+    INNER JOIN patient      p  ON s.patient_id    = p.internal_id
+    INNER JOIN cancer_study cs ON p.cancer_study_id = cs.cancer_study_id
+
+    UNION ALL
+
+    -- Legacy PATIENT-level resources
+    SELECT
+        toInt32(rowNumberInAllBlocks()) + 2000000 AS RESOURCE_DATA_ID,
+        rp.resource_id  AS RESOURCE_ID,
+        toInt32(cs.cancer_study_id) AS CANCER_STUDY_ID,
+        'PATIENT'       AS ENTITY_TYPE,
+        pt.stable_id    AS PATIENT_ID,
+        NULL            AS SAMPLE_ID,
+        rp.url          AS URL,
+        NULL            AS DISPLAY_NAME,
+        NULL            AS TYPE,
+        NULL            AS METADATA,
+        0               AS PRIORITY
+    FROM resource_patient rp
+    INNER JOIN patient      pt ON rp.internal_id     = pt.internal_id
+    INNER JOIN cancer_study cs ON pt.cancer_study_id = cs.cancer_study_id
+
+    UNION ALL
+
+    -- Legacy STUDY-level resources (internal_id IS cancer_study_id in resource_study)
+    SELECT
+        toInt32(rowNumberInAllBlocks()) + 3000000 AS RESOURCE_DATA_ID,
+        rst.resource_id     AS RESOURCE_ID,
+        toInt32(rst.internal_id) AS CANCER_STUDY_ID,
+        'STUDY'             AS ENTITY_TYPE,
+        NULL                AS PATIENT_ID,
+        NULL                AS SAMPLE_ID,
+        rst.url             AS URL,
+        NULL                AS DISPLAY_NAME,
+        NULL                AS TYPE,
+        NULL                AS METADATA,
+        0                   AS PRIORITY
+    FROM resource_study rst;
 
 CREATE TABLE sample (
     `internal_id` Int64,
