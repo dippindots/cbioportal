@@ -90,6 +90,7 @@ DROP TABLE IF EXISTS patient;
 DROP TABLE IF EXISTS reference_genome;
 DROP TABLE IF EXISTS reference_genome_gene;
 DROP TABLE IF EXISTS resource_definition;
+DROP TABLE IF EXISTS resource_data;
 DROP TABLE IF EXISTS resource_patient;
 DROP TABLE IF EXISTS resource_sample;
 DROP TABLE IF EXISTS resource_study;
@@ -615,7 +616,7 @@ CREATE TABLE resource_definition (
 CREATE TABLE resource_data (
     `RESOURCE_DATA_ID` Int64,
     `RESOURCE_ID`      String,
-    `CANCER_STUDY_ID`  Int64,
+    `CANCER_STUDY_ID`  Int32,
     `ENTITY_TYPE`      String,
     `PATIENT_ID`       Nullable(String),
     `SAMPLE_ID`        Nullable(String),
@@ -626,23 +627,8 @@ CREATE TABLE resource_data (
 ) ENGINE = MergeTree ORDER BY (CANCER_STUDY_ID, RESOURCE_ID, PATIENT_ID, SAMPLE_ID, RESOURCE_DATA_ID)
   SETTINGS allow_nullable_key = 1;
 
-CREATE TABLE resource_patient (
-    `internal_id` Int64,
-    `resource_id` String,
-    `url` String
-) ENGINE = MergeTree ORDER BY (internal_id, resource_id, url);
 
-CREATE TABLE resource_sample (
-    `internal_id` Int64,
-    `resource_id` String,
-    `url` String
-) ENGINE = MergeTree ORDER BY (internal_id, resource_id, url);
 
-CREATE TABLE resource_study (
-    `internal_id` Int64,
-    `resource_id` String,
-    `url` String
-) ENGINE = MergeTree ORDER BY (internal_id, resource_id, url);
 
 CREATE TABLE sample (
     `internal_id` Int64,
