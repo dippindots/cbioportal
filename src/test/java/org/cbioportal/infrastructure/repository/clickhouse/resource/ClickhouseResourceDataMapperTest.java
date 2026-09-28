@@ -1,8 +1,11 @@
 package org.cbioportal.infrastructure.repository.clickhouse.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cbioportal.domain.resource.ResourceIdentifierFixtures.patients;
+import static org.cbioportal.domain.resource.ResourceIdentifierFixtures.samples;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.cbioportal.domain.resource.ResourceColumnFilter;
 import org.cbioportal.domain.resource.ResourceFacetOption;
 import org.cbioportal.domain.resource.ResourceMetadataKeyStats;
@@ -13,6 +16,7 @@ import org.cbioportal.domain.resource.ResourceTableTab;
 import org.cbioportal.domain.resource.ResourceTabsRequest;
 import org.cbioportal.infrastructure.repository.clickhouse.AbstractTestcontainers;
 import org.cbioportal.infrastructure.repository.clickhouse.config.MyBatisConfig;
+import org.cbioportal.legacy.web.parameter.SampleIdentifier;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ClickhouseResourceDataMapperTest {
 
   private static final String STUDY_TCGA_PUB = "study_tcga_pub";
+  private static final String ACC_TCGA = "acc_tcga";
 
   @Autowired private ClickhouseResourceDataMapper mapper;
 
@@ -78,7 +83,8 @@ public class ClickhouseResourceDataMapperTest {
   @Test
   public void getResourceTableTabs_filteredByPatientIds_onlyMatchingPatient() {
     ResourceTabsRequest request =
-        new ResourceTabsRequest(List.of(STUDY_TCGA_PUB), List.of("tcga-a1-a0sb"), null);
+        new ResourceTabsRequest(
+            List.of(STUDY_TCGA_PUB), patients(STUDY_TCGA_PUB, "tcga-a1-a0sb"), null);
 
     List<ResourceTableTab> tabs = mapper.getResourceTableTabs(request);
 
@@ -99,7 +105,9 @@ public class ClickhouseResourceDataMapperTest {
     // patient-level row, since "SAMPLE_ID IN (...)" is never true for a NULL SAMPLE_ID).
     ResourceTabsRequest request =
         new ResourceTabsRequest(
-            List.of(STUDY_TCGA_PUB), List.of("tcga-a1-a0sb"), List.of("tcga-a1-a0sb-01"));
+            List.of(STUDY_TCGA_PUB),
+            patients(STUDY_TCGA_PUB, "tcga-a1-a0sb"),
+            samples(STUDY_TCGA_PUB, "tcga-a1-a0sb-01"));
 
     List<ResourceTableTab> tabs = mapper.getResourceTableTabs(request);
 
@@ -121,8 +129,8 @@ public class ClickhouseResourceDataMapperTest {
         new ResourceTableQuery(
             List.of(STUDY_TCGA_PUB),
             "CT_SCAN",
-            List.of("tcga-a1-a0sb"),
-            List.of("tcga-a1-a0sb-01"),
+            patients(STUDY_TCGA_PUB, "tcga-a1-a0sb"),
+            samples(STUDY_TCGA_PUB, "tcga-a1-a0sb-01"),
             null,
             0,
             10,
@@ -618,5 +626,107 @@ public class ClickhouseResourceDataMapperTest {
             List.of(scoreFilter, doseFilter));
 
     assertThat(mapper.getResourceTableCounts(query).rowCount()).isEqualTo(1L);
+  }
+
+  // ---- Multi-study cohorts ----
+  //
+  // resource_data stores stable ids, which are unique only within a study. The seed gives acc_tcga
+  // its own sample called 'tcga-a1-a0sb-01' -- a different sample that happens to carry the same
+  // barcode as study_tcga_pub's. A cohort that selects study_tcga_pub's copy plus an unrelated
+  // acc_tcga sample must not pull in acc_tcga's same-named row, and must not count the two
+  // same-named samples as one.
+
+  /**
+   * study_tcga_pub's tcga-a1-a0sb-01 and acc_tcga's tcga-zz-9999-01 -- two samples, two studies.
+   */
+  private static List<SampleIdentifier> crossStudyCohort() {
+    return Stream.concat(
+            samples(STUDY_TCGA_PUB, "tcga-a1-a0sb-01").stream(),
+            samples(ACC_TCGA, "tcga-zz-9999-01").stream())
+        .toList();
+  }
+
+  @Test
+  public void getResourceTableRows_multiStudyCohort_excludesSameNamedSampleFromOtherStudy() {
+    ResourceTableQuery query =
+        new ResourceTableQuery(
+            List.of(STUDY_TCGA_PUB, ACC_TCGA),
+            "HE_SLIDE",
+            null,
+            crossStudyCohort(),
+            null,
+            0,
+            10,
+            null,
+            null,
+            null);
+
+    List<ResourceTableRow> rows = mapper.getResourceTableRows(query);
+
+    // acc-he-collides.jpg belongs to acc_tcga's tcga-a1-a0sb-01, which the cohort never selected.
+    assertThat(rows)
+        .extracting(ResourceTableRow::url)
+        .containsExactlyInAnyOrder(
+            "https://example.com/he1.jpg", "https://example.com/acc-he-own.jpg");
+  }
+
+  @Test
+  public void getResourceTableTabs_multiStudyCohort_excludesSameNamedSampleFromOtherStudy() {
+    ResourceTabsRequest request =
+        new ResourceTabsRequest(List.of(STUDY_TCGA_PUB, ACC_TCGA), null, crossStudyCohort());
+
+    ResourceTableTab heSlide =
+        mapper.getResourceTableTabs(request).stream()
+            .filter(t -> t.resourceId().equals("HE_SLIDE"))
+            .findFirst()
+            .orElseThrow();
+
+    assertThat(heSlide.totalCount()).isEqualTo(2);
+    assertThat(heSlide.sampleCount()).isEqualTo(2);
+  }
+
+  @Test
+  public void getResourceTableCounts_multiStudyCohort_doesNotCollapseSameNamedSamples() {
+    // No cohort filter: HE_SLIDE spans study_tcga_pub's two samples plus acc_tcga's two. Three of
+    // the four barcodes are distinct, but tcga-a1-a0sb-01 occurs in both studies, so counting
+    // distinct bare stable ids would report 3 samples where there are 4.
+    ResourceTableQuery query =
+        new ResourceTableQuery(
+            List.of(STUDY_TCGA_PUB, ACC_TCGA),
+            "HE_SLIDE",
+            null,
+            null,
+            null,
+            0,
+            10,
+            null,
+            null,
+            null);
+
+    ResourceTableCounts counts = mapper.getResourceTableCounts(query);
+
+    assertThat(counts.rowCount()).isEqualTo(4);
+    assertThat(counts.sampleCount()).isEqualTo(4);
+  }
+
+  @Test
+  public void getResourceTableRows_singleStudyCohort_isUnaffectedByTheTupleGuard() {
+    // One study cannot be ambiguous, so the study-qualified predicate is skipped entirely.
+    ResourceTableQuery query =
+        new ResourceTableQuery(
+            List.of(STUDY_TCGA_PUB),
+            "HE_SLIDE",
+            null,
+            samples(STUDY_TCGA_PUB, "tcga-a1-a0sb-01"),
+            null,
+            0,
+            10,
+            null,
+            null,
+            null);
+
+    assertThat(mapper.getResourceTableRows(query))
+        .extracting(ResourceTableRow::url)
+        .containsExactly("https://example.com/he1.jpg");
   }
 }

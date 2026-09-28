@@ -701,3 +701,10 @@ insert into resource_data (RESOURCE_DATA_ID, RESOURCE_ID, CANCER_STUDY_ID, ENTIT
 insert into resource_data (RESOURCE_DATA_ID, RESOURCE_ID, CANCER_STUDY_ID, ENTITY_TYPE, PATIENT_ID, SAMPLE_ID, URL, DISPLAY_NAME, TYPE, METADATA) values (5, 'FIGURES', 1, 'STUDY', NULL, NULL, 'https://example.com/fig2.pdf', 'Study Figure 2', 'PDF', '{"pages":25}');
 insert into resource_data (RESOURCE_DATA_ID, RESOURCE_ID, CANCER_STUDY_ID, ENTITY_TYPE, PATIENT_ID, SAMPLE_ID, URL, DISPLAY_NAME, TYPE, METADATA) values (6, 'RADIOLOGY', 1, 'SAMPLE', 'tcga-a1-a0se', 'tcga-a1-a0se-01', 'https://example.com/rad1.dcm', 'Radiology 1', 'IMAGE', '{"dose_id":"1001","score":"85","operator":"tech-a","aperture":"wide"}');
 insert into resource_data (RESOURCE_DATA_ID, RESOURCE_ID, CANCER_STUDY_ID, ENTITY_TYPE, PATIENT_ID, SAMPLE_ID, URL, DISPLAY_NAME, TYPE, METADATA) values (7, 'RADIOLOGY', 1, 'SAMPLE', 'tcga-a1-a0sf', 'tcga-a1-a0sf-01', 'https://example.com/rad2.dcm', 'Radiology 2', 'IMAGE', '{"dose_id":"1002","score":"42","operator":"tech-b","aperture":"narrow"}');
+
+-- Study 2 (acc_tcga) deliberately reuses stable ids that also exist in study 1. Stable ids are
+-- unique only within a study, so a cohort spanning both studies must not match study 2's
+-- 'tcga-a1-a0sb-01' just because study 1's sample of that name was selected, and the distinct
+-- patient/sample counts must not collapse the two into one.
+insert into resource_data (RESOURCE_DATA_ID, RESOURCE_ID, CANCER_STUDY_ID, ENTITY_TYPE, PATIENT_ID, SAMPLE_ID, URL, DISPLAY_NAME, TYPE, METADATA) values (8, 'HE_SLIDE', 2, 'SAMPLE', 'tcga-a1-a0sb', 'tcga-a1-a0sb-01', 'https://example.com/acc-he-collides.jpg', 'ACC H&E (same barcode, different sample)', 'IMAGE', '{"stain":"HE","magnification":"20x"}');
+insert into resource_data (RESOURCE_DATA_ID, RESOURCE_ID, CANCER_STUDY_ID, ENTITY_TYPE, PATIENT_ID, SAMPLE_ID, URL, DISPLAY_NAME, TYPE, METADATA) values (9, 'HE_SLIDE', 2, 'SAMPLE', 'tcga-zz-9999', 'tcga-zz-9999-01', 'https://example.com/acc-he-own.jpg', 'ACC H&E (own sample)', 'IMAGE', '{"stain":"HE","magnification":"40x"}');

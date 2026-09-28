@@ -212,8 +212,8 @@ public class ClickhouseResourceDataRepository implements ResourceDataRepository 
     return new ResourceTableQuery(
         query.studyIds(),
         query.resourceId(),
-        query.patientIds(),
-        query.sampleIds(),
+        query.patientIdentifiers(),
+        query.sampleIdentifiers(),
         query.search(),
         query.pageNumber(),
         query.pageSize(),
