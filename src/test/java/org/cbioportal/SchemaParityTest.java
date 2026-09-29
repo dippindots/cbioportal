@@ -34,9 +34,18 @@ public class SchemaParityTest {
   // Read from the source tree, not the classpath: pom.xml excludes db-scripts/** from the
   // packaged resources, so the production schema is not on it. Surefire runs from the project
   // basedir.
+  private static final String POM = "pom.xml";
   private static final String PRODUCTION =
       "src/main/resources/db-scripts/clickhouse/init/schema.sql";
   private static final String TEST_COPY = "src/test/resources/schema.sql";
+
+  private static final Pattern SEEDED_VERSION =
+      Pattern.compile(
+          "INSERT INTO info\\s*\\([^)]*\\)\\s*VALUES\\s*\\(\\s*'([^']+)'",
+          Pattern.CASE_INSENSITIVE);
+
+  private static final Pattern POM_DB_VERSION =
+      Pattern.compile("<db\\.version>([^<]+)</db\\.version>");
 
   private static final Pattern CREATE_TABLE =
       Pattern.compile(
@@ -57,6 +66,32 @@ public class SchemaParityTest {
           .as("definition of table '%s' in %s", table.getKey(), TEST_COPY)
           .isEqualTo(table.getValue());
     }
+  }
+
+  /**
+   * A fresh install seeds info.db_schema_version from schema.sql, and {@link
+   * org.cbioportal.SchemaVersionChecker} refuses to start the application when that value does not
+   * match db.version from pom.xml. Bumping the migration without bumping the seed therefore breaks
+   * every fresh install -- the portal will not boot -- while upgrades from an older database keep
+   * working, so it is easy to miss.
+   */
+  @Test
+  public void seededSchemaVersionMatchesTheVersionTheBuildExpects() throws IOException {
+    String expected = match(POM_DB_VERSION, read(POM), "db.version in " + POM);
+
+    assertThat(match(SEEDED_VERSION, read(PRODUCTION), "seeded db_schema_version in " + PRODUCTION))
+        .as("%s seeds a db_schema_version the build would refuse to start against", PRODUCTION)
+        .isEqualTo(expected);
+
+    assertThat(match(SEEDED_VERSION, read(TEST_COPY), "seeded db_schema_version in " + TEST_COPY))
+        .as("%s seeds a different db_schema_version from production", TEST_COPY)
+        .isEqualTo(expected);
+  }
+
+  private static String match(Pattern pattern, String text, String what) {
+    Matcher matcher = pattern.matcher(text);
+    assertThat(matcher.find()).as("found %s", what).isTrue();
+    return matcher.group(1).trim();
   }
 
   /** Table name to normalised "columns | engine" definition. */
