@@ -388,20 +388,30 @@
   </select>
 
   <!--
-    A key that is unique or near-unique per row produces a facet nobody can use and a payload that
-    grows with the data. LIMIT is the caller's cap plus one, so an over-cap key is recognised and
-    its facet dropped, leaving the column searchable but not enumerable, the same treatment
-    numeric columns get with a range.
+    Every metadata facet in one pass. The per-key form needed one aggregation over the resource
+    for each key, so the cost grew with the number of keys; this explodes each row's metadata into
+    key/value pairs once and groups them together.
+
+    LIMIT ... BY metaKey applies the cap per key rather than to the result as a whole, so one
+    near-unique key cannot crowd out the others. As in the single-key form the cap is the caller's
+    plus one, so an over-cap key is recognised and dropped.
   -->
-  <select id="getResourceTableMetadataFacetValues" resultMap="ResourceFacetOptionResultMap">
-    SELECT JSONExtractString(ifNull(rdata.metadata, '{}'), #{metadataKey}) AS value, count(*) AS count
-    <include refid="ResourceTableFromClause"/>
-    <include refid="ResourceTableBaseFilters"/>
-    AND rdata.metadata IS NOT NULL
-    AND JSONExtractString(ifNull(rdata.metadata, '{}'), #{metadataKey}) != ''
-    GROUP BY value
-    ORDER BY value ASC
-    LIMIT #{limit}
+  <select id="getResourceTableMetadataFacets" resultType="org.cbioportal.domain.resource.ResourceMetadataFacetValue">
+    SELECT metaKey, value, count(*) AS count
+    FROM (
+      SELECT kv.1 AS metaKey, JSONExtractString(kv.2) AS value
+      FROM (
+        SELECT arrayJoin(JSONExtractKeysAndValuesRaw(ifNull(rdata.metadata, '{}'))) AS kv
+        <include refid="ResourceTableFromClause"/>
+        <include refid="ResourceTableBaseFilters"/>
+        AND rdata.metadata IS NOT NULL AND rdata.metadata != '' AND rdata.metadata != '{}'
+      ) pairs
+    ) vals
+    WHERE value != ''
+      AND metaKey IN (#{metadataKeys, typeHandler=org.apache.ibatis.type.ArrayTypeHandler})
+    GROUP BY metaKey, value
+    ORDER BY metaKey ASC, value ASC
+    LIMIT #{limitPerKey} BY metaKey
   </select>
 
   <!--

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.cbioportal.domain.resource.ResourceColumnInfo;
 import org.cbioportal.domain.resource.ResourceFacetOption;
 import org.cbioportal.domain.resource.ResourceMetadataField;
+import org.cbioportal.domain.resource.ResourceMetadataFacetValue;
 import org.cbioportal.domain.resource.ResourceMetadataKeyStats;
 import org.cbioportal.domain.resource.ResourceMetadataSchema;
 import org.cbioportal.domain.resource.ResourceNumericRange;
@@ -124,9 +125,9 @@ public class ClickhouseResourceDataRepository implements ResourceDataRepository 
     }
 
     Map<String, ResourceNumericRange> facetRanges = new LinkedHashMap<>();
+    List<String> categoricalKeys = new ArrayList<>();
     for (Map.Entry<String, ResourceMetadataKeyStats> entry : context.statsByKey().entrySet()) {
       String key = entry.getKey();
-      String columnId = ResourceColumnInfo.METADATA_COLUMN_PREFIX + key;
       if (!context.isFilterable(key)) {
         continue;
       }
@@ -134,17 +135,47 @@ public class ClickhouseResourceDataRepository implements ResourceDataRepository 
         // Numeric columns get a min/max range instead of an enumerated value list, which would be
         // huge and unhelpful for a continuous measurement.
         ResourceMetadataKeyStats stats = entry.getValue();
-        facetRanges.put(columnId, new ResourceNumericRange(stats.minValue(), stats.maxValue()));
+        facetRanges.put(
+            ResourceColumnInfo.METADATA_COLUMN_PREFIX + key,
+            new ResourceNumericRange(stats.minValue(), stats.maxValue()));
       } else {
-        List<ResourceFacetOption> values =
-            mapper.getResourceTableMetadataFacetValues(scoped, key, MAX_FACET_VALUES + 1);
-        if (withinFacetCap(columnId, values)) {
-          facets.put(columnId, values);
-        }
+        categoricalKeys.add(key);
       }
     }
+    facets.putAll(metadataFacets(scoped, categoricalKeys));
 
     return new ResourceTableMetadataView(metadataColumns(context), facets, facetRanges);
+  }
+
+  /**
+   * All categorical metadata facets in one query, grouped by key, with over-cap keys dropped.
+   */
+  private Map<String, List<ResourceFacetOption>> metadataFacets(
+      ResourceTableQuery scoped, List<String> keys) {
+    if (keys.isEmpty()) {
+      return Map.of();
+    }
+    List<ResourceMetadataFacetValue> rows =
+        mapper.getResourceTableMetadataFacets(
+            scoped, keys.toArray(new String[0]), MAX_FACET_VALUES + 1);
+
+    Map<String, List<ResourceFacetOption>> byKey = new LinkedHashMap<>();
+    for (ResourceMetadataFacetValue row : rows) {
+      byKey
+          .computeIfAbsent(row.metaKey(), k -> new ArrayList<>())
+          .add(new ResourceFacetOption(row.value(), row.count()));
+    }
+
+    Map<String, List<ResourceFacetOption>> facets = new LinkedHashMap<>();
+    // Iterate the requested keys, not the result, so column order follows the contract.
+    for (String key : keys) {
+      String columnId = ResourceColumnInfo.METADATA_COLUMN_PREFIX + key;
+      List<ResourceFacetOption> values = byKey.get(key);
+      if (withinFacetCap(columnId, values)) {
+        facets.put(columnId, values);
+      }
+    }
+    return facets;
   }
 
   /**
