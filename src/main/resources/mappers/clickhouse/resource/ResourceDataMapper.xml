@@ -388,11 +388,10 @@
   </select>
 
   <!--
-    A near-unique key produces a facet nobody can use and a response nobody wants: on a 1.17M-row
-    imaging resource one ID-like key returned 1,165,727 values and 40MB of JSON, and four such
-    keys made up most of a 148MB response. LIMIT is the caller's cap plus one, so an over-cap key
-    is recognised and its facet dropped, leaving the column searchable but not enumerable: the
-    same treatment numeric columns get with a range.
+    A key that is unique or near-unique per row produces a facet nobody can use and a payload that
+    grows with the data. LIMIT is the caller's cap plus one, so an over-cap key is recognised and
+    its facet dropped, leaving the column searchable but not enumerable, the same treatment
+    numeric columns get with a range.
   -->
   <select id="getResourceTableMetadataFacetValues" resultMap="ResourceFacetOptionResultMap">
     SELECT JSONExtractString(ifNull(rdata.metadata, '{}'), #{metadataKey}) AS value, count(*) AS count
@@ -408,12 +407,11 @@
   <!--
     Discovers which metadata keys the rows carry and whether each is numeric.
 
-    Three things keep this bounded on a large resource. It reads a sample of rows rather than all
-    of them: on a 1.17M-row imaging resource the unbounded form peaked at 7.35 GiB. It pulls the
-    key/value pairs out in one pass with JSONExtractKeysAndValuesRaw instead of listing the keys
-    and then re-parsing the document once per key. And it never carries the document itself
-    through the arrayJoin: with ~30 keys and ~1KB of JSON per row that was ~35M rows each
-    holding a full document.
+    Three things keep its cost flat as a resource grows. It reads a bounded sample of rows rather
+    than all of them. It pulls the key/value pairs out in one pass with
+    JSONExtractKeysAndValuesRaw instead of listing the keys and then re-parsing the document once
+    per key. And it never carries the document itself through the arrayJoin, which would otherwise
+    duplicate the whole JSON once per key per row.
 
     JSONExtractString on a raw value reproduces the old semantics exactly: "HE" gives HE, 42 gives
     42, true gives true, and a quoted number still parses as numeric. rawValue is extracted once

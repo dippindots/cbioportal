@@ -29,22 +29,21 @@ public class ClickhouseResourceDataRepository implements ResourceDataRepository 
   private static final Map<String, String> FACET_COLUMNS = Map.of("type", "rdata.type");
 
   /**
-   * Past this many distinct values a facet is no use as a dropdown and expensive to ship: on a
-   * 1.17M-row imaging resource, four ID-like keys returned over a million values each and made up
-   * most of a 148MB response. An over-cap column keeps its search box but loses its value list,
-   * the same way a numeric column gets a range instead.
+   * Past this many distinct values a facet is no use as a dropdown, and the payload grows with the
+   * data: a key that is unique or near-unique per row enumerates the whole resource. An over-cap
+   * column keeps its search box but loses its value list, the same way a numeric column gets a
+   * range instead.
    */
   private static final int MAX_FACET_VALUES = 500;
 
   /**
-   * Key discovery and numeric detection read this many rows rather than the whole resource.
-   * Unbounded, that query peaked at 7.35 GiB and took 3.8s on the resource above. A key appearing
-   * only beyond the sample is not discovered; the bound is large enough that this needs very
-   * heterogeneous metadata to matter.
+   * Key discovery and numeric detection read this many rows rather than the whole resource, so
+   * their cost stays flat as a resource grows. A key appearing only beyond the sample is not
+   * discovered; the bound is large enough that this needs very heterogeneous metadata to matter.
    */
   private static final int KEY_DISCOVERY_SAMPLE_ROWS = 100_000;
 
-  /** Backstop so one request cannot take the server down even if the sample is raised. */
+  /** Backstop so a single request cannot exhaust server memory if the sample is raised. */
   private static final long KEY_DISCOVERY_MAX_MEMORY_BYTES = 2L * 1024 * 1024 * 1024;
 
   private final ClickhouseResourceDataMapper mapper;
